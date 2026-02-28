@@ -43,7 +43,7 @@ async def on_ready():
 
 # إرسال إشعار للمديرين
 async def send_admins_notification(user_name, phone, pkg, order_id, contact_discord_id):
-    embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xc300ff)
+    embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xffae00) # لون ذهبي مستوحى من السيرفر
     embed.add_field(name="العميل", value=f"<@{contact_discord_id}> ({user_name})", inline=True)
     embed.add_field(name="رقم الكاش", value=phone, inline=True)
     embed.add_field(name="الباقة", value=pkg, inline=False)
