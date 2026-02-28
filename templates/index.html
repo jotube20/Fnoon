@@ -61,9 +61,16 @@
         .filter-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid transparent; color: #a1a1a6; background: transparent; cursor: pointer; transition: 0.3s; font-size: 0.9rem;}
         .filter-btn.active { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 15px rgba(255,255,255,0.05); }
 
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 0 15px 30px; }
-        .design-card { padding: 15px; text-align: center; }
-        .design-img { width: 100%; height: 180px; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 0 15px 40px; }
+        .design-card { padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;}
+        
+        /* تظبيط مقاسات الصور عشان متمطش */
+        .pkg-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); object-fit: contain; }
+        
+        /* قائمة مميزات الباقات */
+        .pkg-features { list-style: none; text-align: right; margin-bottom: 20px; padding: 0 5px; }
+        .pkg-features li { color: #d1d1d6; font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4;}
+        .pkg-features li::before { content: '✨'; font-size: 0.8rem; margin-top: 2px;}
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { width: 100%; max-width: 400px; padding: 25px 20px; text-align: center; animation: popUp 0.3s ease-out; }
@@ -121,31 +128,89 @@
         <h2 class="section-title">معرض التصاميم</h2>
         <div class="filters glass-panel" style="width: max-content; margin: 0 auto 30px;">
             <button class="filter-btn active" onclick="filterDesigns('all', this)">الكل</button>
-            <button class="filter-btn" onclick="filterDesigns('logos', this)">شعارات</button>
-            <button class="filter-btn" onclick="filterDesigns('servers', this)">سيرفرات</button>
-            <button class="filter-btn" onclick="filterDesigns('posters', this)">بوسترات</button>
+            <button class="filter-btn" onclick="filterDesigns('servers', this)">باقات السيرفرات</button>
         </div>
 
         <div class="gallery">
-            <div class="design-card glass-panel" data-category="servers">
-                <div class="design-img"></div>
-                <h3 style="margin-bottom: 5px;">تجهيز سيرفر شامل</h3>
-                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">رولات، تصميمات، وبوتات مخصصة</p>
-                <h3 style="color: #fff; font-size: 1.5rem;">500 ج.م</h3>
-                <button class="btn-glass" onclick="openCheckout('تجهيز سيرفر شامل', 500)">
-                    <span class="material-icons-round">shopping_cart</span> شراء الآن
-                </button>
-            </div>
             
-            <div class="design-card glass-panel" data-category="logos">
-                <div class="design-img"></div>
-                <h3 style="margin-bottom: 5px;">تصميم لوجو بروفيشنال</h3>
-                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">شعار احترافي بجودة عالية</p>
-                <h3 style="color: #fff; font-size: 1.5rem;">250 ج.م</h3>
-                <button class="btn-glass" onclick="openCheckout('تصميم لوجو بروفيشنال', 250)">
-                    <span class="material-icons-round">shopping_cart</span> شراء الآن
-                </button>
+            <div class="design-card glass-panel" data-category="servers">
+                <div>
+                    <img src="{{ url_for('static', filename='basic.png') }}" alt="Basic" class="pkg-img">
+                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Basic</h3>
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">فئة التصميم البسيطة</p>
+                    
+                    <ul class="pkg-features">
+                        <li>شعار أحرف أو رمزي (ثابت)</li>
+                        <li>1 بنر ديسكورد</li>
+                        <li>1 خط فاصل</li>
+                        <li>6 صور إنفو</li>
+                        <li>3 صور بوتات</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">750 ج.م</h3>
+                    <button class="btn-glass" onclick="openCheckout('باقة Basic', 750)">
+                        <span class="material-icons-round">shopping_cart</span> شراء الآن
+                    </button>
+                </div>
             </div>
+
+            <div class="design-card glass-panel" data-category="servers">
+                <div>
+                    <img src="{{ url_for('static', filename='master.png') }}" alt="Master" class="pkg-img">
+                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Master</h3>
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">فئة التصميم المتوسطة</p>
+                    
+                    <ul class="pkg-features">
+                        <li>شعار أحرف أو رمزي (متحرك)</li>
+                        <li>1 بنر ديسكورد</li>
+                        <li>1 خط فاصل</li>
+                        <li>1 ترحيب ديسكورد</li>
+                        <li>1 بانر إنفايت (ثابت)</li>
+                        <li>1 صور علبة ألوان</li>
+                        <li>1 إنفو قوانين</li>
+                        <li>صور إنفو (لا نهائية)</li>
+                        <li>صور بوتات (لا نهائية)</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">1500 ج.م</h3>
+                    <button class="btn-glass" onclick="openCheckout('باقة Master', 1500)">
+                        <span class="material-icons-round">shopping_cart</span> شراء الآن
+                    </button>
+                </div>
+            </div>
+
+            <div class="design-card glass-panel" data-category="servers">
+                <div>
+                    <img src="{{ url_for('static', filename='premium.png') }}" alt="Premium" class="pkg-img">
+                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Premium</h3>
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">فئة التصميم الاحترافية</p>
+                    
+                    <ul class="pkg-features">
+                        <li>شعار أحرف أو رمزي (متحرك)</li>
+                        <li>1 بانر ديسكورد</li>
+                        <li>1 خط فاصل</li>
+                        <li>1 ترحيب ديسكورد</li>
+                        <li>1 بانر إنفايت (ثابت)</li>
+                        <li>1 صور علبة ألوان</li>
+                        <li>1 إنفو قوانين</li>
+                        <li>3 بنرات بروفايلات</li>
+                        <li>1 صورة افتتاحية</li>
+                        <li>صور إنفو وألعاب وبوتات (لا نهائية)</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">2250 ج.م</h3>
+                    <button class="btn-glass" onclick="openCheckout('باقة Premium', 2250)">
+                        <span class="material-icons-round">shopping_cart</span> شراء الآن
+                    </button>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -200,7 +265,7 @@
 
             document.querySelectorAll('.design-card').forEach(card => {
                 if(category === 'all' || card.getAttribute('data-category') === category) {
-                    card.style.display = 'block';
+                    card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
                 }
