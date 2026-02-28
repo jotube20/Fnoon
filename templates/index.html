@@ -20,7 +20,6 @@
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin: 15px; }
         .logo img { max-height: 45px; }
         
-        /* تظبيط القائمة عشان تبين إنت في أنهي صفحة */
         .nav-links { display: none; } 
         .nav-btn.active { background: rgba(255,255,255,0.2); box-shadow: 0 0 15px rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); }
 
@@ -77,7 +76,7 @@
             <a href="#" class="nav-btn" onclick="switchTab('packages-section', this); return false;">الباقات</a>
         </nav>
         <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="material-icons-round" onclick="openOrders()" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'">inventory_2</span>
+            <span class="material-icons-round" onclick="openOrders()" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="طلباتي">inventory_2</span>
             {% if user %}<img src="{{ user.avatar }}" class="user-avatar" style="width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); cursor: pointer;" onclick="window.location.href='/logout'">
             {% else %}<a href="/login" class="btn-glass" style="text-decoration:none; padding: 8px 15px;"><span class="material-icons-round" style="font-size: 1.2rem;">login</span> دخول</a>{% endif %}
         </div>
@@ -90,7 +89,7 @@
             <p>وجهتك الأولى لتصاميم ديسكورد والبوسترات والشعارات الاحترافية بأعلى جودة ودقة.</p>
             <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                 <button class="btn-glass" onclick="switchTab('portfolio-section', document.querySelectorAll('.nav-btn')[1])">تصفح الأعمال <span class="material-icons-round">palette</span></button>
-                <button class="btn-glass" style="background:transparent;" onclick="switchTab('packages-section', document.querySelectorAll('.nav-btn')[2])">الباقات <span class="material-icons-round">inventory_2</span></button>
+                <button class="btn-glass" style="background:transparent; border: 1px solid rgba(255,255,255,0.3);" onclick="switchTab('packages-section', document.querySelectorAll('.nav-btn')[2])">الباقات <span class="material-icons-round">inventory_2</span></button>
             </div>
         </section>
 
@@ -122,14 +121,26 @@
     </div>
 
     <div id="portfolio-section" class="page-section">
-        <h2 style="text-align: center; margin: 40px 0 10px; font-size: 2.2rem;">معرض التصاميم</h2>
+        <div style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
+            <button class="btn-glass" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05);" onclick="switchTab('home-section', document.querySelectorAll('.nav-btn')[0])">
+                <span class="material-icons-round" style="font-size: 1.2rem;">arrow_forward</span> رجوع للرئيسية
+            </button>
+        </div>
+
+        <h2 style="text-align: center; margin: 20px 0 10px; font-size: 2.2rem;">معرض التصاميم</h2>
         <p style="text-align: center; color: #a1a1a6; margin-bottom: 30px;">تصفح أحدث وأفضل أعمالنا السابقة</p>
         <section id="portfolio" class="portfolio-grid">
             </section>
     </div>
 
     <div id="packages-section" class="page-section">
-        <h2 style="text-align: center; margin: 40px 0 10px; font-size: 2.2rem;">باقات السيرفرات</h2>
+        <div style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
+            <button class="btn-glass" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05);" onclick="switchTab('home-section', document.querySelectorAll('.nav-btn')[0])">
+                <span class="material-icons-round" style="font-size: 1.2rem;">arrow_forward</span> رجوع للرئيسية
+            </button>
+        </div>
+
+        <h2 style="text-align: center; margin: 20px 0 10px; font-size: 2.2rem;">باقات السيرفرات</h2>
         <p style="text-align: center; color: #a1a1a6; margin-bottom: 30px;">اختر الباقة التي تناسب مشروعك</p>
         <section class="gallery">
             <div class="design-card glass-panel">
@@ -211,18 +222,14 @@
     <script>
         // دالة التنقل بين الصفحات بنظام الـ Tabs
         function switchTab(sectionId, btnElement) {
-            // إخفاء كل الأقسام
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-section'));
-            // إظهار القسم المطلوب
             document.getElementById(sectionId).classList.add('active-section');
             
-            // تظبيط القائمة العلوية
             if(btnElement) {
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
                 btnElement.classList.add('active');
             }
             
-            // الرجوع لأول الصفحة
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
