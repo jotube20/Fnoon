@@ -2,119 +2,158 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Fnoon Studio | فنون</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #030303;
+            --bg-color: #050505;
             --text-color: #ffffff;
-            /* زجاج موحد شفاف 50% */
-            --glass-bg: rgba(30, 30, 30, 0.5); 
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             --primary: #c300ff;
             --secondary: #0084ff;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; overflow-x: hidden;}
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; overflow-x: hidden; position: relative; }
 
-        /* النيون في الخلفية */
-        .blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; }
-        .blob { position: absolute; filter: blur(140px); border-radius: 50%; opacity: 0.5; animation: float 15s infinite alternate; }
-        .blob-1 { width: 500px; height: 500px; background: var(--primary); top: -10%; right: -10%; }
-        .blob-2 { width: 400px; height: 400px; background: var(--secondary); bottom: -10%; left: -10%; animation-delay: -5s; }
-        @keyframes float { 0% { transform: translate(0,0); } 100% { transform: translate(-50px, 50px); } }
-
-        /* الكلاس الزجاجي الأساسي */
-        .uniform-glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
+        /* إضاءة نيون في الخلفية عشان تكسر الإزاز */
+        .ambient-light {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
+            background: radial-gradient(circle at 10% 20%, rgba(195, 0, 255, 0.15), transparent 30%),
+                        radial-gradient(circle at 90% 80%, rgba(0, 132, 255, 0.15), transparent 30%);
         }
 
-        /* الهيدر وتسجيل الدخول */
-        header { display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; }
-        .nav-links { display: flex; gap: 15px; }
-        .nav-btn { text-decoration: none; color: #fff; padding: 10px 25px; border-radius: 30px; transition: 0.3s; cursor: pointer; }
-        .nav-btn:hover { background: rgba(255,255,255,0.1); }
+        /* 🔴 التأثير الزجاجي الفخم (الجديد) 🔴 */
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            /* لمعة الحواف */
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            border-right: 1px solid rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+            /* الظل الداخلي والخارجي */
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255,255,255,0.03);
+            border-radius: 20px;
+        }
+
+        /* الأزرار الزجاجية */
+        .btn-glass {
+            background: linear-gradient(135deg, rgba(195, 0, 255, 0.5), rgba(0, 132, 255, 0.5));
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-left: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid transparent;
+            border-right: 1px solid transparent;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        .btn-glass:hover {
+            box-shadow: 0 4px 20px rgba(195, 0, 255, 0.4), inset 0 0 15px rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        .btn-glass:active { transform: scale(0.97); }
+
+        /* الهيدر */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin: 15px; }
+        .logo { font-size: 1.5rem; font-weight: 800; background: -webkit-linear-gradient(right, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-links { display: none; } /* مخفي في الموبايل */
         
         .user-auth { display: flex; align-items: center; gap: 10px; }
-        .btn-login { background: #5865F2; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 20px; display: flex; align-items: center; gap: 5px; font-weight: bold;}
-        .user-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--primary); cursor: pointer; }
+        .btn-login { text-decoration: none; width: auto; padding: 8px 15px; font-size: 0.9rem;}
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); object-fit: cover; cursor: pointer; }
 
-        /* المعرض والفلتر */
-        .section-title { text-align: center; font-size: 2.5rem; margin: 40px 0 20px; }
-        .filters { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; flex-wrap: wrap;}
-        .filter-btn { padding: 8px 20px; border-radius: 20px; border: 1px solid var(--glass-border); color: #fff; background: transparent; cursor: pointer; transition: 0.3s;}
-        .filter-btn.active, .filter-btn:hover { background: var(--primary); border-color: var(--primary); }
+        /* المعرض */
+        .section-title { text-align: center; font-size: 2rem; margin: 30px 0 15px; }
+        .filters { display: flex; justify-content: center; gap: 8px; margin: 0 15px 30px; flex-wrap: wrap; padding: 8px;}
+        .filter-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid transparent; color: #a1a1a6; background: transparent; cursor: pointer; transition: 0.3s; font-size: 0.9rem;}
+        .filter-btn.active { background: rgba(255,255,255,0.1); color: #fff; border-top: 1px solid rgba(255,255,255,0.2); border-left: 1px solid rgba(255,255,255,0.2); }
 
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 0 5%; }
-        .design-card { border-radius: 15px; padding: 15px; text-align: center; }
-        .design-img { width: 100%; height: 200px; border-radius: 10px; background: rgba(0,0,0,0.5); margin-bottom: 15px; object-fit: cover;}
-        .btn-buy { width: 100%; padding: 12px; border-radius: 10px; background: var(--primary); border: none; color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 5px;}
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 0 15px 30px; }
+        .design-card { padding: 15px; text-align: center; }
+        .design-img { width: 100%; height: 180px; border-radius: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
 
-        /* النوافذ المنبثقة (الدفع / الطلبات) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { width: 90%; max-width: 500px; padding: 30px; border-radius: 20px; text-align: center; }
-        .modal-content h2 { margin-bottom: 15px; }
-        
-        .input-glass { width: 100%; padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #fff; border-radius: 10px; outline: none; }
+        /* النوافذ المنبثقة */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { width: 100%; max-width: 400px; padding: 25px 20px; text-align: center; animation: popUp 0.3s ease-out; }
+        @keyframes popUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid transparent; border-right: 1px solid transparent; color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);}
         .input-glass:focus { border-color: var(--primary); }
 
-        /* تتبع الطلب (Progress Bar) */
-        .order-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: right; }
-        .progress-bar { display: flex; gap: 5px; margin-top: 15px; }
-        .step { flex: 1; height: 8px; border-radius: 4px; background: rgba(255,255,255,0.1); }
-        .status-0 .step:nth-child(1) { background: #ffd60a; } /* أصفر Pending */
-        .status-1 .step:nth-child(1), .status-1 .step:nth-child(2) { background: #ff9f0a; } /* برتقالي Working */
-        .status-2 .step { background: #32d74b; } /* أخضر Completed */
-        
-        .status-text { font-size: 0.85rem; margin-top: 5px; color: #a1a1a6; }
+        .btn-outline { background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.1); margin-top: 10px; color: #fff; }
 
-        .lucifer-badge { background: #000; padding: 2px 8px; border-radius: 5px; font-family: monospace; border: 1px solid var(--glass-border); }
+        /* 💻 تظبيطات شاشات الكمبيوتر 💻 */
+        @media (min-width: 768px) {
+            header { padding: 20px 40px; margin: 20px 5%; }
+            .nav-links { display: flex; gap: 15px; }
+            .nav-btn { text-decoration: none; color: #fff; padding: 10px 25px; border-radius: 12px; transition: 0.3s; }
+            .nav-btn:hover { background: rgba(255,255,255,0.1); }
+            .gallery { padding: 0 5%; }
+            .modal-content { padding: 35px; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <div class="ambient-light"></div>
 
-    <header class="uniform-glass" style="margin: 20px 5%; border-radius: 20px;">
-        <div class="logo"><img src="YOUR_LOGO_URL.png" alt="Fnoon" height="40"></div>
+    <header class="glass-panel">
+        <div class="logo">FNOON</div>
         <nav class="nav-links">
-            <a href="#" class="nav-btn uniform-glass">الرئيسية</a>
-            <a href="#designs" class="nav-btn uniform-glass">التصاميم</a>
-            <a href="#" onclick="openOrders()" class="nav-btn uniform-glass">طلباتي</a>
+            <a href="#" class="nav-btn">الرئيسية</a>
+            <a href="#designs" class="nav-btn">التصاميم</a>
+            <a href="#" onclick="openOrders()" class="nav-btn">طلباتي</a>
         </nav>
         <div class="user-auth">
+            <span class="material-icons-round" onclick="openOrders()" style="cursor:pointer; color:#a1a1a6; margin-left:10px; font-size: 1.8rem;" title="طلباتي">inventory_2</span>
             {% if user %}
                 <img src="{{ user.avatar }}" class="user-avatar" onclick="window.location.href='/logout'" title="تسجيل خروج">
             {% else %}
-                <a href="/login" class="btn-login uniform-glass"><span class="material-icons-round">login</span> دخول بديسكورد</a>
+                <a href="/login" class="btn-glass btn-login"><span class="material-icons-round" style="font-size:1.2rem;">login</span> دخول</a>
             {% endif %}
         </div>
     </header>
 
     <main id="designs">
         <h2 class="section-title">معرض التصاميم</h2>
-        <div class="filters uniform-glass" style="width: max-content; margin: 0 auto 30px; padding: 10px; border-radius: 30px;">
+        <div class="filters glass-panel" style="width: max-content; margin: 0 auto 30px;">
             <button class="filter-btn active">الكل</button>
             <button class="filter-btn">شعارات</button>
-            <button class="filter-btn">تجهيز سيرفرات</button>
+            <button class="filter-btn">سيرفرات</button>
             <button class="filter-btn">بوسترات</button>
         </div>
 
         <div class="gallery">
-            <div class="design-card uniform-glass">
+            <div class="design-card glass-panel">
                 <div class="design-img"></div>
-                <h3>تجهيز سيرفر ديسكورد شامل</h3>
-                <p style="color: #a1a1a6; margin: 10px 0;">رولات، تصميمات، وبوتات مخصصة.</p>
-                <h3 style="color: var(--primary);">500 ج.م</h3>
-                <button class="btn-buy" onclick="openCheckout('تجهيز سيرفر شامل', 500)">
+                <h3 style="margin-bottom: 5px;">تجهيز سيرفر شامل</h3>
+                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">رولات، تصميمات، وبوتات مخصصة</p>
+                <h3 style="color: var(--primary); font-size: 1.5rem;">500 ج.م</h3>
+                <button class="btn-glass" onclick="openCheckout('تجهيز سيرفر شامل', 500)">
+                    <span class="material-icons-round">shopping_cart</span> شراء الآن
+                </button>
+            </div>
+            
+            <div class="design-card glass-panel">
+                <div class="design-img"></div>
+                <h3 style="margin-bottom: 5px;">تصميم لوجو بروفيشنال</h3>
+                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">شعار احترافي بجودة عالية</p>
+                <h3 style="color: var(--primary); font-size: 1.5rem;">250 ج.م</h3>
+                <button class="btn-glass" onclick="openCheckout('تصميم لوجو بروفيشنال', 250)">
                     <span class="material-icons-round">shopping_cart</span> شراء الآن
                 </button>
             </div>
@@ -122,45 +161,35 @@
     </main>
 
     <div class="modal" id="checkoutModal">
-        <div class="modal-content uniform-glass" id="checkoutForm">
+        <div class="modal-content glass-panel" id="checkoutForm">
             {% if user %}
-                <h2>إتمام الطلب</h2>
-                <p style="color: #d1d1d6; margin-bottom: 20px;">التحويل على فودافون كاش: <strong style="color:#fff; font-size:1.2rem;">01004811745</strong></p>
-                <input type="text" id="vCashNum" class="input-glass" placeholder="رقم الموبايل الذي قمت بالتحويل منه">
+                <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round" style="color:var(--primary);">account_balance_wallet</span> الدفع</h2>
+                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;">التحويل على فودافون كاش:<br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
+                <input type="tel" id="vCashNum" class="input-glass" placeholder="رقم الموبايل المحول منه">
                 <input type="hidden" id="pkgName">
                 <input type="hidden" id="pkgPrice">
-                <button class="btn-buy" onclick="submitOrder()"><span class="material-icons-round">payment</span> تأكيد الدفع</button>
-                <button class="btn-buy" style="background:transparent; border:1px solid #fff; margin-top:10px;" onclick="closeModals()">إلغاء</button>
+                <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> تأكيد الدفع</button>
+                <button class="btn-glass btn-outline" onclick="closeModals()">إلغاء</button>
             {% else %}
-                <h2>تنبيه</h2>
-                <p>يجب تسجيل الدخول بواسطة ديسكورد لإتمام عملية الشراء.</p>
-                <a href="/login" class="btn-login" style="justify-content:center; margin-top:20px;">تسجيل الدخول</a>
-                <button class="btn-buy" style="background:transparent; border:1px solid #fff; margin-top:10px;" onclick="closeModals()">إغلاق</button>
+                <h2 style="margin-bottom: 15px;">تنبيه</h2>
+                <p style="color: #a1a1a6; margin-bottom: 20px;">يجب تسجيل الدخول بواسطة ديسكورد لإتمام الشراء.</p>
+                <a href="/login" class="btn-glass" style="text-decoration:none;">تسجيل الدخول الآن</a>
+                <button class="btn-glass btn-outline" onclick="closeModals()">إغلاق</button>
             {% endif %}
         </div>
 
-        <div class="modal-content uniform-glass" id="receiptBox" style="display:none;">
-            <h2><span class="material-icons-round" style="color:#32d74b; font-size: 2rem; vertical-align:middle;">check_circle</span> تم تسجيل طلبك!</h2>
-            <div style="background: rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); padding:15px; border-radius:10px; margin:20px 0; text-align:right;">
-                <p><strong>الباقة:</strong> <span id="recPkg"></span></p>
-                <p><strong>رقم التحويل:</strong> <span id="recPhone"></span></p>
-                <p><strong>رقم الإيصال:</strong> <span id="recId" style="color: var(--primary);"></span></p>
+        <div class="modal-content glass-panel" id="receiptBox" style="display:none;">
+            <h2 style="color: #32d74b; margin-bottom: 15px;"><span class="material-icons-round" style="vertical-align:middle;">check_circle</span> تم تسجيل طلبك!</h2>
+            <div class="glass-panel" style="padding:15px; margin:20px 0; text-align:right; font-size: 0.95rem; background:rgba(0,0,0,0.2);">
+                <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;">الباقة:</strong> <span id="recPkg"></span></p>
+                <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;">الرقم:</strong> <span id="recPhone"></span></p>
+                <p><strong style="color:#a1a1a6;">رقم الإيصال:</strong> <span id="recId" style="color: var(--primary); font-weight:bold; letter-spacing:1px;"></span></p>
             </div>
-            <div style="background: rgba(255, 59, 48, 0.15); border: 1px solid #ff3b30; padding: 15px; border-radius: 10px;">
+            <div style="background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
                 <strong style="color: #ff3b30; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">warning</span> خطوة أخيرة!</strong>
-                <p style="margin-top:10px;">أرسل لقطة شاشة للإيصال فوراً إلى <span class="lucifer-badge">946m</span> (لوسيفر) عبر ديسكورد للبدء.</p>
+                <p style="margin-top:8px; color:#d1d1d6;">أرسل سكرين شوت للإيصال إلى <span style="background:#000; padding:2px 6px; border-radius:4px; font-family:monospace;">946m</span> عبر ديسكورد.</p>
             </div>
-            <button class="btn-buy" style="margin-top:15px;" onclick="closeModals()">إغلاق وإكمال التصفح</button>
-        </div>
-    </div>
-
-    <div class="modal" id="ordersModal">
-        <div class="modal-content uniform-glass" style="max-height: 80vh; overflow-y: auto;">
-            <h2><span class="material-icons-round" style="vertical-align:middle;">inventory_2</span> طلباتي</h2>
-            <div id="ordersList">
-                <p style="color:#a1a1a6;">جاري التحميل...</p>
-            </div>
-            <button class="btn-buy" style="background:transparent; border:1px solid #fff; margin-top:20px;" onclick="closeModals()">إغلاق</button>
+            <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()">العودة للمعرض</button>
         </div>
     </div>
 
@@ -184,49 +213,34 @@
 
             if(!phone) return alert("يرجى إدخال رقم الكاش!");
 
-            const res = await fetch('/api/checkout', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({vodafone_number: phone, package_name: pkg, price: price})
-            });
-            const data = await res.json();
+            const btn = document.querySelector('#checkoutForm .btn-glass');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="material-icons-round" style="animation: rotate 1s linear infinite;">sync</span> جاري التأكيد...';
+            btn.style.pointerEvents = 'none';
 
-            if(data.success) {
-                document.getElementById('checkoutForm').style.display = 'none';
-                document.getElementById('receiptBox').style.display = 'block';
-                document.getElementById('recPkg').innerText = pkg;
-                document.getElementById('recPhone').innerText = phone;
-                document.getElementById('recId').innerText = "#" + data.order_id;
-            } else {
-                alert(data.message);
+            try {
+                const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({vodafone_number: phone, package_name: pkg, price: price})
+                });
+                const data = await res.json();
+
+                if(data.success) {
+                    document.getElementById('checkoutForm').style.display = 'none';
+                    document.getElementById('receiptBox').style.display = 'block';
+                    document.getElementById('recPkg').innerText = pkg;
+                    document.getElementById('recPhone').innerText = phone;
+                    document.getElementById('recId').innerText = "#" + data.order_id;
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                alert("حدث خطأ في الاتصال بالسيرفر.");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.style.pointerEvents = 'auto';
             }
-        }
-
-        async function openOrders() {
-            document.getElementById('ordersModal').style.display = 'flex';
-            const list = document.getElementById('ordersList');
-            list.innerHTML = '<p style="color:#a1a1a6;">جاري التحميل...</p>';
-            
-            const res = await fetch('/api/my_orders');
-            const orders = await res.json();
-            
-            if(orders.length === 0) {
-                list.innerHTML = '<p>لا توجد طلبات سابقة.</p>';
-                return;
-            }
-
-            list.innerHTML = orders.map(o => {
-                let statusText = o.status === 0 ? "قيد الانتظار (Pending)" : o.status === 1 ? "جاري العمل (On its way)" : "مكتمل (Completed)";
-                return `
-                <div class="order-card">
-                    <h3 style="color:#fff;">${o.package_name}</h3>
-                    <p style="color:#a1a1a6; font-size:0.9rem;">بتاريخ: ${o.date} | رقم الطلب: #${o._id ? o._id.substring(18).toUpperCase() : '...'}</p>
-                    <div class="progress-bar status-${o.status}">
-                        <div class="step"></div><div class="step"></div><div class="step"></div>
-                    </div>
-                    <div class="status-text">${statusText}</div>
-                </div>`;
-            }).join('');
         }
     </script>
 </body>
