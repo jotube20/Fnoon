@@ -8,38 +8,50 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #050505;
+            --bg-color: #030303; /* خلفية أغمق للفخامة */
             --text-color: #ffffff;
-            --primary: #c300ff;
-            --secondary: #0084ff;
+            /* لوحة الألوان الجديدة المستوحاة من السيرفر */
+            --primary: #ffae00; /* ذهبي ملكي */
+            --secondary: #00b8d4; /* تيل نيون */
+            /* للمسة الشفافة، نحتاج لمكونات الـ RGB للألوان الأساسية */
+            --primary-rgb: 255, 174, 0;
+            --secondary-rgb: 0, 184, 212;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; overflow-x: hidden; position: relative; }
 
+        /* إضاءة نيون ذهبية وتيل في الخلفية */
         .ambient-light {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
-            background: radial-gradient(circle at 10% 20%, rgba(195, 0, 255, 0.15), transparent 30%),
-                        radial-gradient(circle at 90% 80%, rgba(0, 132, 255, 0.15), transparent 30%);
+            background: radial-gradient(circle at 15% 25%, rgba(var(--primary-rgb), 0.12), transparent 30%),
+                        radial-gradient(circle at 85% 75%, rgba(var(--secondary-rgb), 0.12), transparent 30%);
         }
 
+        /* 🔴 تأثير زجاجي frosted glass فخم جداً 🔴 */
         .glass-panel {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.4) 100%);
-            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(255, 255, 255, 0.15); border-left: 1px solid rgba(255, 255, 255, 0.15);
+            background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.5) 100%);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1); border-left: 1px solid rgba(255, 255, 255, 0.1);
             border-right: 1px solid rgba(255, 255, 255, 0.02); border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(255,255,255,0.03);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255,255,255,0.02);
             border-radius: 20px;
         }
 
+        /* 🔴 الأزرار الزجاجية النيون (توهج من الجوانب) 🔴 */
         .btn-glass {
-            background: linear-gradient(135deg, rgba(195, 0, 255, 0.5), rgba(0, 132, 255, 0.5));
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255, 255, 255, 0.3); border-left: 1px solid rgba(255, 255, 255, 0.3);
-            border-bottom: 1px solid transparent; border-right: 1px solid transparent;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3), inset 0 0 10px rgba(255,255,255,0.1);
+            background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.3) 0%, rgba(var(--secondary-rgb), 0.3) 100%);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             color: #fff; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1rem;
             cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.3s ease; width: 100%;
+            /* لمعان قوي من الجوانب العلوي واليسرى */
+            border-top: 1px solid rgba(255, 255, 255, 0.4); border-left: 1px solid rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid transparent; border-right: 1px solid transparent;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4), 0 0 10px rgba(var(--primary-rgb), 0.2), inset 0 0 15px rgba(255,255,255,0.1);
+        }
+        .btn-glass:hover {
+            box-shadow: 0 5px 25px rgba(var(--primary-rgb), 0.4), 0 0 20px rgba(var(--secondary-rgb), 0.3), inset 0 0 20px rgba(255,255,255,0.2);
+            transform: translateY(-2px);
         }
         .btn-glass:active { transform: scale(0.97); }
 
@@ -54,13 +66,14 @@
         .section-title { text-align: center; font-size: 2rem; margin: 30px 0 15px; }
         .filters { display: flex; justify-content: center; gap: 8px; margin: 0 15px 30px; flex-wrap: wrap; padding: 8px;}
         .filter-btn { padding: 8px 16px; border-radius: 12px; border: 1px solid transparent; color: #a1a1a6; background: transparent; cursor: pointer; transition: 0.3s; font-size: 0.9rem;}
-        .filter-btn.active { background: rgba(255,255,255,0.1); color: #fff; border-top: 1px solid rgba(255,255,255,0.2); border-left: 1px solid rgba(255,255,255,0.2); }
+        /* فلتر نشط بلمعة ذهبية */
+        .filter-btn.active { background: rgba(var(--primary-rgb), 0.1); color: #fff; border-top: 1px solid rgba(255,255,255,0.3); border-left: 1px solid rgba(255,255,255,0.3); box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.3); }
 
         .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 0 15px 30px; }
         .design-card { padding: 15px; text-align: center; }
         .design-img { width: 100%; height: 180px; border-radius: 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { width: 100%; max-width: 400px; padding: 25px 20px; text-align: center; animation: popUp 0.3s ease-out; }
         @keyframes popUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
@@ -69,13 +82,13 @@
 
         .btn-outline { background: rgba(255,255,255,0.05); border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.1); margin-top: 10px; color: #fff; }
 
-        /* Progress Bar */
-        .order-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: right; }
+        /* Progress Bar (محدث بالألوان الجديدة) */
+        .order-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.08); padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: right; }
         .progress-bar { display: flex; gap: 6px; margin-top: 15px; }
         .step { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.05); }
-        .status-0 .step:nth-child(1) { background: #ffd60a; box-shadow: 0 0 10px rgba(255,214,10,0.5);} 
+        .status-0 .step:nth-child(1) { background: var(--primary); box-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5);} 
         .status-1 .step:nth-child(1), .status-1 .step:nth-child(2) { background: #ff9f0a; box-shadow: 0 0 10px rgba(255,159,10,0.5);} 
-        .status-2 .step { background: #32d74b; box-shadow: 0 0 10px rgba(50,215,75,0.5);} 
+        .status-2 .step { background: var(--secondary); box-shadow: 0 0 10px rgba(var(--secondary-rgb), 0.5);} 
         .status-text { font-size: 0.85rem; margin-top: 8px; color: #a1a1a6; font-weight: bold;}
 
         @media (min-width: 768px) {
@@ -165,14 +178,14 @@
         </div>
 
         <div class="modal-content glass-panel" id="receiptBox" style="display:none;">
-            <h2 style="color: #32d74b; margin-bottom: 15px;"><span class="material-icons-round" style="vertical-align:middle;">check_circle</span> تم تسجيل طلبك!</h2>
+            <h2 style="color: var(--secondary); margin-bottom: 15px;"><span class="material-icons-round" style="vertical-align:middle;">check_circle</span> تم تسجيل طلبك!</h2>
             <div class="glass-panel" style="padding:15px; margin:20px 0; text-align:right; font-size: 0.95rem; background:rgba(0,0,0,0.2);">
                 <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;">الباقة:</strong> <span id="recPkg"></span></p>
                 <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;">الرقم:</strong> <span id="recPhone"></span></p>
                 <p><strong style="color:#a1a1a6;">رقم الإيصال:</strong> <span id="recId" style="color: var(--primary); font-weight:bold; letter-spacing:1px;"></span></p>
             </div>
-            <div style="background: rgba(255, 59, 48, 0.1); border: 1px solid rgba(255, 59, 48, 0.3); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
-                <strong style="color: #ff3b30; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">warning</span> خطوة أخيرة!</strong>
+            <div style="background: rgba(var(--secondary-rgb), 0.05); border: 1px solid rgba(var(--secondary-rgb), 0.2); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
+                <strong style="color: var(--secondary); display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">check</span> خطوة أخيرة!</strong>
                 <p style="margin-top:8px; color:#d1d1d6;">أرسل سكرين شوت للإيصال إلى <span style="background:#000; padding:2px 6px; border-radius:4px; font-family:monospace;">946m</span> عبر ديسكورد.</p>
             </div>
             <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()">العودة للمعرض</button>
@@ -181,14 +194,13 @@
 
     <div class="modal" id="ordersModal">
         <div class="modal-content glass-panel" style="max-height: 85vh; overflow-y: auto;">
-            <h2><span class="material-icons-round">inventory_2</span> طلباتي</h2>
+            <h2 style="color:var(--primary);"><span class="material-icons-round">inventory_2</span> طلباتي</h2>
             <div id="ordersList" style="margin-top: 20px;"></div>
             <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()">إغلاق</button>
         </div>
     </div>
 
     <script>
-        // دالة فلترة التصاميم الجديدة
         function filterDesigns(category, btnElement) {
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             btnElement.classList.add('active');
