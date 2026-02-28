@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fnoon Admin | لوحة الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root { --bg-color: #080808; --text-color: #ffffff; --glass-white: rgba(255, 255, 255, 0.12); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; padding: 20px;}
+        .ambient-light { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 60%); }
+        
+        .glass-panel { background: var(--glass-white); backdrop-filter: blur(18px) brightness(0.9); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); border-radius: 20px; padding: 20px;}
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { display: flex; align-items: center; gap: 10px; font-size: 1.5rem;}
+        
+        .order-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px;}
+        .order-info span { color: #a1a1a6; font-size: 0.9rem;}
+        .order-info strong { color: #fff; }
+        
+        .actions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;}
+        .btn { flex: 1; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 5px; color: #fff; transition: 0.2s;}
+        .btn:active { transform: scale(0.95); }
+        .btn-work { background: rgba(255, 159, 10, 0.8); border: 1px solid #ff9f0a; }
+        .btn-done { background: rgba(50, 215, 75, 0.8); border: 1px solid #32d74b; }
+        .btn-del { background: rgba(255, 59, 48, 0.8); border: 1px solid #ff3b30; }
+        
+        @media (min-width: 768px) {
+            .orders-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-light"></div>
+
+    <div class="glass-panel">
+        <div class="header">
+            <h1><span class="material-icons-round">admin_panel_settings</span> مركز القيادة</h1>
+            <a href="/" style="color: #fff; text-decoration: none; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 10px;">رجوع للموقع</a>
+        </div>
+
+        <div id="ordersContainer" class="orders-grid">
+            <p style="text-align: center; color: #a1a1a6; width: 100%;">جاري تحميل الطلبات...</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadOrders() {
+            const res = await fetch('/api/admin/orders');
+            const orders = await res.json();
+            const container = document.getElementById('ordersContainer');
+            
+            if(orders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #a1a1a6; width: 100%;">لا توجد طلبات حالياً.</p>';
+                return;
+            }
+
+            container.innerHTML = orders.map(o => `
+                <div class="order-card">
+                    <div style="display:flex; justify-content: space-between;">
+                        <h3 style="color:#fff;">${o.package_name}</h3>
+                        <span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 5px; font-family: monospace;">#${o.short_id || 'OLD'}</span>
+                    </div>
+                    <div class="order-info">
+                        <p><span>العميل:</span> <strong>${o.username}</strong> <span style="font-size:0.7rem;">(${o.contact_discord_id})</span></p>
+                        <p><span>رقم الكاش:</span> <strong>${o.vodafone_number}</strong></p>
+                        <p><span>الحالة الحالية:</span> <strong>${o.status === 0 ? 'قيد الانتظار 🟡' : o.status === 1 ? 'جاري العمل 🟠' : 'مكتمل 🟢'}</strong></p>
+                        <p><span>التاريخ:</span> <strong>${o.date}</strong></p>
+                    </div>
+                    <div class="actions">
+                        ${o.status === 0 ? `<button class="btn btn-work" onclick="updateOrder('${o.short_id}', 1)"><span class="material-icons-round">build</span> بدأ العمل</button>` : ''}
+                        ${o.status === 1 ? `<button class="btn btn-done" onclick="updateOrder('${o.short_id}', 2)"><span class="material-icons-round">check_circle</span> اكتمل</button>` : ''}
+                        <button class="btn btn-del" onclick="updateOrder('${o.short_id}', -1)"><span class="material-icons-round">delete</span> حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function updateOrder(id, action) {
+            if(action === -1 && !confirm("هل أنت متأكد من حذف هذا الطلب نهائياً؟")) return;
+            
+            await fetch('/api/admin/update', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({short_id: id, action: action})
+            });
+            loadOrders(); // تحديث القائمة فوراً
+        }
+
+        loadOrders();
+        // تحديث أوتوماتيكي كل 10 ثواني عشان لو طلب جديد جه
+        setInterval(loadOrders, 10000);
+    </script>
+</body>
+</html>
