@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fnoon Studio | فنون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-color: #ffffff;
+            /* شفافية موحدة 50% سادة بدون أي تدرج */
+            --glass-bg: rgba(30, 30, 30, 0.5); 
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --primary: #c300ff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; position: relative; }
+
+        /* بقع الإضاءة لبروز الزجاج */
+        .blobs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; z-index: -1; }
+        .blob { position: absolute; filter: blur(120px); border-radius: 50%; opacity: 0.6; animation: float 15s infinite alternate ease-in-out; }
+        .blob-1 { width: 500px; height: 500px; background: #c300ff; top: -10%; right: -10%; }
+        .blob-2 { width: 400px; height: 400px; background: #0084ff; bottom: -10%; left: -10%; animation-delay: -5s; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-50px, 50px) scale(1.1); }
+        }
+
+        /* الكلاس الزجاجي الموحد */
+        .uniform-glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* نافذة الدفع */
+        .checkout-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.85); z-index: 1000; justify-content: center; align-items: center;
+        }
+        
+        .checkout-box {
+            width: 90%; max-width: 450px; padding: 30px; border-radius: 20px; text-align: center;
+        }
+
+        .checkout-box h2 { margin-bottom: 20px; font-size: 1.8rem; }
+        .info-text { color: #d1d1d6; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6; }
+        
+        .cash-number {
+            background: rgba(195, 0, 255, 0.15); border: 1px solid var(--primary);
+            padding: 12px; border-radius: 12px; font-size: 1.6rem; font-weight: bold; letter-spacing: 2px;
+            margin-bottom: 25px; display: inline-block; color: #fff;
+        }
+
+        .input-field {
+            width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px;
+            background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; font-size: 1rem; outline: none; text-align: right; transition: 0.3s;
+        }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(195,0,255,0.2); }
+
+        .btn-pay {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            background: var(--primary); color: #fff; font-size: 1.1rem; font-weight: bold;
+            cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-pay:hover { background: #a100d6; transform: translateY(-2px); }
+
+        /* الإيصال */
+        .receipt-box { display: none; text-align: center; }
+        .receipt-card {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(195, 0, 255, 0.4);
+            padding: 20px; border-radius: 15px; margin: 20px 0; text-align: right;
+        }
+        .receipt-card p { margin-bottom: 12px; font-size: 1.1rem; color: #e5e5ea; }
+        .receipt-card strong { color: #fff; }
+        
+        .warning-box {
+            background: rgba(255, 59, 48, 0.15); border: 1px solid #ff3b30;
+            padding: 15px; border-radius: 12px; margin-top: 20px; color: #fff; text-align: center;
+        }
+        .warning-box strong { color: #ff3b30; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 10px;}
+        .lucifer-user { background: #000; padding: 4px 10px; border-radius: 6px; font-family: monospace; font-size: 1.1rem; border: 1px solid rgba(255,255,255,0.2); }
+
+    </style>
+</head>
+<body>
+    <div class="blobs"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+
+    <div style="height: 100vh; display: flex; justify-content: center; align-items: center;">
+        <button class="btn-pay uniform-glass" style="width: auto; padding: 20px 40px;" onclick="openCheckout()">
+            <span class="material-icons-round">shopping_cart</span> شراء تصميم الديسكورد الشامل
+        </button>
+    </div>
+
+    <div class="checkout-modal" id="checkoutModal">
+        <div class="checkout-box uniform-glass" id="checkoutForm">
+            <h2>إتمام الطلب</h2>
+            <p class="info-text">سيتم التواصل عبر ديسكورد. يرجى تحويل مبلغ <strong style="color:#fff;">500 ج.م</strong> إلى رقم فودافون كاش التالي:</p>
+            <div class="cash-number">01004811745</div>
+            
+            <input type="text" id="discordUser" class="input-field" placeholder="يوزر ديسكورد الخاص بك (مثال: abdo12)">
+            <input type="text" id="vCashNum" class="input-field" placeholder="الرقم الذي قمت بالتحويل منه">
+            
+            <button class="btn-pay" onclick="processPayment()">
+                <span class="material-icons-round">payment</span> تأكيد الدفع
+            </button>
+        </div>
+
+        <div class="checkout-box uniform-glass receipt-box" id="receiptBox">
+            <h2><span class="material-icons-round" style="color: #34c759; font-size: 2rem; vertical-align: middle;">check_circle</span> تم تسجيل طلبك!</h2>
+            
+            <div class="receipt-card">
+                <p><strong>الطلب:</strong> تصميم ديسكورد شامل</p>
+                <p><strong>المبلغ:</strong> 500 ج.م</p>
+                <p><strong>رقم التحويل:</strong> <span id="receiptPhone"></span></p>
+                <p><strong>رقم الإيصال:</strong> <span id="receiptId" style="color: var(--primary); font-weight: bold;"></span></p>
+            </div>
+
+            <button class="btn-pay" style="background: rgba(255,255,255,0.1); border: 1px solid #fff;">
+                <span class="material-icons-round">download</span> حفظ الإيصال
+            </button>
+
+            <div class="warning-box">
+                <strong><span class="material-icons-round">warning</span> خطوة أخيرة للبدء!</strong>
+                يرجى إرسال لقطة شاشة لهذا الإيصال فوراً إلى المصمم لوسيفر (Lucifer) عبر ديسكورد.<br><br>
+                يوزر التواصل: <span class="lucifer-user">946m</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openCheckout() {
+            document.getElementById('checkoutModal').style.display = 'flex';
+        }
+
+        async function processPayment() {
+            const discordUser = document.getElementById('discordUser').value;
+            const vCashNum = document.getElementById('vCashNum').value;
+
+            if(!discordUser || !vCashNum) {
+                alert("يرجى تعبئة جميع الحقول أولاً");
+                return;
+            }
+
+            // إرسال البيانات للـ Backend
+            try {
+                const response = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        discord_user: discordUser,
+                        vodafone_number: vCashNum,
+                        package_name: "تصميم ديسكورد شامل",
+                        price: 500
+                    })
+                });
+
+                const result = await response.json();
+
+                if(result.success) {
+                    document.getElementById('checkoutForm').style.display = 'none';
+                    document.getElementById('receiptBox').style.display = 'block';
+                    document.getElementById('receiptPhone').innerText = vCashNum;
+                    document.getElementById('receiptId').innerText = "#" + result.order_id;
+                }
+            } catch (error) {
+                alert("حدث خطأ أثناء الاتصال بالسيرفر. يرجى المحاولة لاحقاً.");
+            }
+        }
+    </script>
+</body>
+</html>
