@@ -11,17 +11,18 @@ app = Flask(__name__)
 app.secret_key = os.getenv("FLASK_SECRET_KEY", "fnoon_super_secret_123")
 
 # ==========================================
-# إعدادات البيئة (Render Environment Variables)
+# إعدادات البيئة
 # ==========================================
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-LUCIFER_ID = int(os.getenv("LUCIFER_ID", "1234567890")) # الـ ID بتاعك
-GUILD_ID = int(os.getenv("GUILD_ID", "1234567890")) # ID سيرفر فنون
+LUCIFER_ID = int(os.getenv("LUCIFER_ID", "1234567890"))
+SECOND_ADMIN_ID = 892133353757736960 # الأيدي التاني اللي طلبته
+GUILD_ID = int(os.getenv("GUILD_ID", "1234567890"))
 
-# إعدادات تسجيل الدخول (Discord OAuth2)
+# إعدادات تسجيل الدخول
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REDIRECT_URI = os.getenv("REDIRECT_URI", "https://YOUR_RENDER_URL.onrender.com/callback")
+REDIRECT_URI = os.getenv("REDIRECT_URI", "https://fnoon.onrender.com/callback")
 OAUTH2_URL = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&response_type=code&scope=identify"
 
 # قاعدة البيانات
@@ -30,7 +31,7 @@ db = client['fnoon_studio']
 orders_collection = db['orders']
 
 # ==========================================
-# إعدادات ديسكورد بوت
+# إعدادات البوت
 # ==========================================
 intents = discord.Intents.default()
 intents.members = True
@@ -40,39 +41,31 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f'✅ البوت {bot.user.name} جاهز ومربوط بالموقع!')
 
-async def send_lucifer_notification(user_name, phone, pkg, order_id):
-    lucifer = await bot.fetch_user(LUCIFER_ID)
+# إرسال إشعار للمديرين
+async def send_admins_notification(user_name, phone, pkg, order_id, contact_discord_id):
     embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xc300ff)
-    embed.add_field(name="العميل", value=user_name, inline=True)
+    embed.add_field(name="العميل", value=f"<@{contact_discord_id}> ({user_name})", inline=True)
     embed.add_field(name="رقم الكاش", value=phone, inline=True)
     embed.add_field(name="الباقة", value=pkg, inline=False)
     embed.add_field(name="رقم الإيصال", value=f"#{order_id}", inline=False)
-    embed.set_footer(text="يجب التأكد من تحويل المبلغ على 01004811745")
-    await lucifer.send(embed=embed)
-
-async def create_ticket(user_id, topic):
-    guild = bot.get_guild(GUILD_ID)
-    member = guild.get_member(int(user_id))
-    if not member: return False
+    embed.set_footer(text="Fnoon Studio | تحويل على 01004811745")
     
-    overwrites = {
-        guild.default_role: discord.PermissionOverwrite(read_messages=False),
-        member: discord.PermissionOverwrite(read_messages=True, send_messages=True),
-        guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True)
-    }
-    ticket_channel = await guild.create_text_channel(name=f'ticket-{member.name}', overwrites=overwrites)
-    await ticket_channel.send(f"أهلاً بك {member.mention}، لوسيفر (`946m`) سيكون معك قريباً.\n**المشكلة:** {topic}")
-    return True
+    admins = [LUCIFER_ID, SECOND_ADMIN_ID]
+    for admin_id in admins:
+        try:
+            admin_user = await bot.fetch_user(admin_id)
+            if admin_user:
+                await admin_user.send(embed=embed)
+        except Exception as e:
+            print(f"Could not send to admin {admin_id}: {e}")
 
 # ==========================================
-# مسارات الموقع (Web Routes)
+# مسارات الموقع
 # ==========================================
-
 @app.route('/')
 def home():
     return render_template('index.html', user=session.get('user'))
 
-# تسجيل الدخول
 @app.route('/login')
 def login():
     return redirect(OAUTH2_URL)
@@ -85,6 +78,8 @@ def logout():
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
+    if not code: return redirect(url_for('home'))
+    
     data = {
         'client_id': CLIENT_ID, 'client_secret': CLIENT_SECRET,
         'grant_type': 'authorization_code', 'code': code, 'redirect_uri': REDIRECT_URI
@@ -93,6 +88,8 @@ def callback():
     r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
     token = r.json().get('access_token')
     
+    if not token: return redirect(url_for('home'))
+
     user_r = requests.get('https://discord.com/api/users/@me', headers={'Authorization': f'Bearer {token}'})
     user_data = user_r.json()
     
@@ -103,42 +100,49 @@ def callback():
     }
     return redirect(url_for('home'))
 
-# الدفع وإنشاء الطلب
 @app.route('/api/checkout', methods=['POST'])
 def checkout():
     if 'user' not in session:
         return jsonify({"success": False, "message": "يجب تسجيل الدخول أولاً!"})
         
     data = request.json
+    contact_id = data.get('contact_discord_id')
+    
+    try:
+        contact_id_int = int(contact_id)
+    except ValueError:
+        return jsonify({"success": False, "message": "أيدي الديسكورد يجب أن يحتوي على أرقام فقط!"})
+
+    # التأكد من وجود العميل في السيرفر
+    guild = bot.get_guild(GUILD_ID)
+    if guild:
+        member = guild.get_member(contact_id_int)
+        if not member:
+            return jsonify({"success": False, "message": "عذراً! هذا الحساب غير موجود في سيرفرنا. يرجى الانضمام لسيرفر فنون أولاً."})
+
     new_order = {
         "user_id": session['user']['id'],
+        "contact_discord_id": contact_id,
         "username": session['user']['username'],
         "vodafone_number": data.get('vodafone_number'),
         "package_name": data.get('package_name'),
         "price": data.get('price'),
-        "status": 0, # 0=Pending, 1=Working, 2=Completed
+        "status": 0,
         "date": datetime.now().strftime("%Y-%m-%d")
     }
     order_id = orders_collection.insert_one(new_order).inserted_id
     short_id = str(order_id)[-6:].upper()
 
-    bot.loop.create_task(send_lucifer_notification(session['user']['username'], data.get('vodafone_number'), data.get('package_name'), short_id))
+    bot.loop.create_task(send_admins_notification(session['user']['username'], data.get('vodafone_number'), data.get('package_name'), short_id, contact_id))
+    
     return jsonify({"success": True, "order_id": short_id})
 
-# جلب طلبات العميل للـ Progress Bar
 @app.route('/api/my_orders')
 def my_orders():
     if 'user' not in session: return jsonify([])
-    orders = list(orders_collection.find({"user_id": session['user']['id']}, {'_id': 0}))
+    orders = list(orders_collection.find({"user_id": session['user']['id']}, {'_id': 1, 'package_name': 1, 'status': 1, 'date': 1}))
+    for o in orders: o['_id'] = str(o['_id'])
     return jsonify(orders)
-
-# التذاكر
-@app.route('/api/support', methods=['POST'])
-def support():
-    if 'user' not in session: return jsonify({"success": False})
-    topic = request.json.get('topic')
-    bot.loop.create_task(create_ticket(session['user']['id'], topic))
-    return jsonify({"success": True})
 
 def run_bot():
     if DISCORD_TOKEN: bot.run(DISCORD_TOKEN)
