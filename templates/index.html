@@ -29,7 +29,7 @@
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; cursor: pointer; transition: 0.3s;}
         .user-avatar:hover { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.3);}
         
-        .profile-dropdown { display: none; position: absolute; top: 55px; /* right أو left حسب اللغة هنتحكم فيها من الـ JS */ width: max-content; min-width: 160px; padding: 10px; flex-direction: column; gap: 5px; z-index: 200; border-radius: 15px; }
+        .profile-dropdown { display: none; position: absolute; top: 55px; width: max-content; min-width: 160px; padding: 10px; flex-direction: column; gap: 5px; z-index: 200; border-radius: 15px; }
         .profile-dropdown.show { display: flex; animation: popUp 0.2s ease-out; }
         .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #fff; cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 0.95rem; }
         .dropdown-item:hover { background: rgba(255, 59, 48, 0.15); color: #ff3b30; }
@@ -52,6 +52,11 @@
 
         .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;}
         .input-glass:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1);}
+
+        /* ستايل مخصص للقائمة المنسدلة في نافذة الدفع */
+        select.input-glass { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 15px center; cursor: pointer; }
+        html[dir="ltr"] select.input-glass { background-position: right 15px center; }
+        select.input-glass option { background: #1e1e1e; color: #fff; text-align: center; }
 
         .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-top: 10px; color: #fff; box-shadow: none;}
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5);}
@@ -87,10 +92,9 @@
         .page-section.active-section { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Tweak for English Font */
-html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-/* حصانة للأيقونات عشان متضربش */
-.material-icons-round { font-family: 'Material Icons Round' !important; }
+        /* تعديلات الخطوط وحل مشكلة الأيقونات */
+        html[dir="ltr"] *:not(.material-icons-round) { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        .material-icons-round { font-family: 'Material Icons Round' !important; }
 
         @media (min-width: 768px) {
             header { padding: 20px 40px; margin: 20px 5%; }
@@ -312,7 +316,21 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             {% if user %}
                 <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round">account_balance_wallet</span> <span data-i18n="modal_pay_title">الدفع</span></h2>
                 <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
+                
                 <input type="text" id="discordIdInput" class="input-glass" value="{{ user.id }}">
+                
+                <select id="designTypeInput" class="input-glass">
+                    <option value="" disabled selected data-i18n="opt_select">اختر نوع التصميم</option>
+                    <option value="تصاميم ديسكورد" data-i18n="opt_discord">تصاميم ديسكورد</option>
+                    <option value="تصاميم استريمنج" data-i18n="opt_stream">تصاميم استريمنج</option>
+                    <option value="تصاميم فايف ام" data-i18n="opt_fivem">تصاميم فايف ام</option>
+                    <option value="تصاميم يوتيوب" data-i18n="opt_youtube">تصاميم يوتيوب</option>
+                    <option value="تصاميم سوشيال ميديا" data-i18n="opt_social">تصاميم سوشيال ميديا</option>
+                    <option value="تصميم sala" data-i18n="opt_sala">تصميم sala</option>
+                    <option value="تصميم مواقع" data-i18n="opt_web">تصميم مواقع</option>
+                    <option value="تصميم شعارات" data-i18n="opt_logo">تصميم شعارات</option>
+                </select>
+
                 <input type="tel" id="vCashNum" class="input-glass">
                 <input type="hidden" id="pkgName">
                 <input type="hidden" id="pkgPrice">
@@ -350,7 +368,6 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
     </div>
 
     <script>
-        // =================== قاموس اللغات ===================
         const translations = {
             ar: {
                 nav_home: "الرئيسية", nav_portfolio: "أحدث الأعمال", nav_packages: "الباقات", nav_orders: "طلباتي",
@@ -375,9 +392,12 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
                 modal_success: "تم تسجيل طلبك!", lbl_pkg: "الباقة:", lbl_num: "الرقم:", lbl_rec: "رقم الإيصال:",
                 modal_last_step: "خطوة أخيرة!", modal_send_ss: "أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.", btn_back_gal: "العودة للمعرض",
                 place_disc: "أيدي الديسكورد (للتواصل)", place_phone: "رقم الموبايل المحول منه",
+                opt_select: "اختر نوع التصميم", opt_discord: "تصاميم ديسكورد", opt_stream: "تصاميم استريمنج",
+                opt_fivem: "تصاميم فايف ام", opt_youtube: "تصاميم يوتيوب", opt_social: "تصاميم سوشيال ميديا",
+                opt_sala: "تصميم sala", opt_web: "تصميم مواقع", opt_logo: "تصميم شعارات",
                 msg_loading: "جاري التحميل...", msg_no_port: "لم يتم إضافة أعمال بعد.", msg_no_orders: "لا توجد طلبات سابقة.",
                 status_0: "قيد الانتظار", status_1: "جاري العمل", status_2: "مكتمل", lbl_order_id: "رقم الطلب:",
-                err_data: "يرجى إكمال البيانات!", err_conn: "حدث خطأ في الاتصال."
+                err_data: "يرجى إكمال البيانات!", err_type: "يرجى اختيار نوع التصميم!", err_conn: "حدث خطأ في الاتصال."
             },
             en: {
                 nav_home: "Home", nav_portfolio: "Portfolio", nav_packages: "Packages", nav_orders: "My Orders",
@@ -402,9 +422,12 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
                 modal_success: "Order Submitted!", lbl_pkg: "Package:", lbl_num: "Number:", lbl_rec: "Receipt ID:",
                 modal_last_step: "One last step!", modal_send_ss: "Send a screenshot of the receipt to 946m via Discord.", btn_back_gal: "Back to Gallery",
                 place_disc: "Discord ID (Contact)", place_phone: "Transfer Phone Number",
+                opt_select: "Select Design Type", opt_discord: "Discord Designs", opt_stream: "Streaming Designs",
+                opt_fivem: "FiveM Designs", opt_youtube: "YouTube Designs", opt_social: "Social Media Designs",
+                opt_sala: "Sala Designs", opt_web: "Website Designs", opt_logo: "Logo Designs",
                 msg_loading: "Loading...", msg_no_port: "No portfolio items added yet.", msg_no_orders: "No previous orders.",
                 status_0: "Pending", status_1: "In Progress", status_2: "Completed", lbl_order_id: "Order ID:",
-                err_data: "Please fill all fields!", err_conn: "Connection error."
+                err_data: "Please fill all fields!", err_type: "Please select a design type!", err_conn: "Connection error."
             }
         };
 
@@ -414,32 +437,24 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             const dict = translations[currentLang];
             
-            // تغيير اتجاه الصفحة
             document.documentElement.lang = currentLang;
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
-            
-            // عكس اتجاه الأسهم
             document.documentElement.style.setProperty('--arrow-dir', currentLang === 'ar' ? '1' : '-1');
 
-            // تحديث النصوص
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if(dict[key]) el.innerHTML = dict[key]; // استخدمنا innerHTML بدل text عشان لو فيه تنسيق جوه
+                if(dict[key]) el.innerHTML = dict[key]; 
             });
 
-            // تحديث الـ Placeholders
             document.getElementById('discordIdInput').placeholder = dict['place_disc'];
             document.getElementById('vCashNum').placeholder = dict['place_phone'];
 
-            // إعادة تحميل البيانات الديناميكية عشان تترجم
             loadPortfolio();
             if(document.getElementById('ordersModal').style.display === 'flex') openOrders();
         }
 
-        // =================== القائمة المنسدلة للصورة ===================
         function toggleProfileMenu() {
             document.getElementById("profileDropdown").classList.toggle("show");
-            // تظبيط مكان القائمة حسب اللغة
             if(currentLang === 'en') {
                 document.getElementById("profileDropdown").style.left = "auto";
                 document.getElementById("profileDropdown").style.right = "0";
@@ -464,7 +479,6 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             document.getElementById("logoutConfirmModal").style.display = "flex";
         }
 
-        // =================== الـ SPA (التنقل) ===================
         function switchTab(sectionId, btnElement) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-section'));
             document.getElementById(sectionId).classList.add('active-section');
@@ -475,7 +489,6 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // =================== الوظائف الديناميكية ===================
         async function loadPortfolio() {
             const dict = translations[currentLang];
             const container = document.getElementById('portfolioList');
@@ -498,7 +511,6 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             } catch(e) { container.innerHTML = `<p style="text-align:center; color:#ff3b30;">${dict['err_conn']}</p>`; }
         }
         
-        // خليناها تحمل مرة واحدة في الأول
         window.onload = loadPortfolio;
 
         function openCheckout(n, p) {
@@ -508,7 +520,9 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             document.getElementById('pkgName').value = n;
             document.getElementById('pkgPrice').value = p;
             
-            // تظبيط الـ Placeholder المبدئي
+            // تصفير القائمة المنسدلة كل مرة يفتح فيها النافذة
+            document.getElementById('designTypeInput').value = "";
+            
             document.getElementById('discordIdInput').placeholder = translations[currentLang]['place_disc'];
             document.getElementById('vCashNum').placeholder = translations[currentLang]['place_phone'];
         }
@@ -517,14 +531,20 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
             document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
         }
 
+        // التحديث الجديد لزرار تأكيد الدفع
         async function submitOrder() {
             const dict = translations[currentLang];
             const phone = document.getElementById('vCashNum').value;
             const pkg = document.getElementById('pkgName').value;
             const price = document.getElementById('pkgPrice').value;
             const discordId = document.getElementById('discordIdInput').value;
+            const designType = document.getElementById('designTypeInput').value; // جلب نوع التصميم
 
             if(!discordId || !phone) return alert(dict['err_data']);
+            if(!designType) return alert(dict['err_type']); // تنبيه لو مختارش التصميم
+
+            // دمج اسم الباقة مع نوع التصميم
+            const finalPkgName = pkg + " (" + designType + ")";
 
             const btnText = document.getElementById('btnConfirmText');
             const originalText = btnText.innerText;
@@ -535,14 +555,14 @@ html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, '
                 const res = await fetch('/api/checkout', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ vodafone_number: phone, package_name: pkg, price: price, contact_discord_id: discordId })
+                    body: JSON.stringify({ vodafone_number: phone, package_name: finalPkgName, price: price, contact_discord_id: discordId })
                 });
                 const data = await res.json();
 
                 if(data.success) {
                     document.getElementById('checkoutForm').style.display = 'none';
                     document.getElementById('receiptBox').style.display = 'block';
-                    document.getElementById('recPkg').innerText = pkg;
+                    document.getElementById('recPkg').innerText = finalPkgName; // إظهار الاسم المدمج
                     document.getElementById('recPhone').innerText = phone;
                     document.getElementById('recId').innerText = "#" + data.order_id;
                 } else {
