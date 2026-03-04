@@ -7,47 +7,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #080808; 
-            --text-color: #ffffff;
-            --primary: #ffffff; 
-            --glass-white: rgba(255, 255, 255, 0.12); 
-        }
-
+        :root { --bg-color: #080808; --text-color: #ffffff; --primary: #ffffff; --glass-white: rgba(255, 255, 255, 0.12); }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; overflow-x: hidden; position: relative; scroll-behavior: smooth; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; overflow-x: hidden; position: relative; scroll-behavior: smooth; transition: all 0.3s;}
 
-        .ambient-light {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden;
-            background: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08), transparent 40%),
-                        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05), transparent 40%);
-        }
+        .ambient-light { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.08), transparent 40%), radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.05), transparent 40%); }
+        .glass-panel { background: var(--glass-white); backdrop-filter: blur(18px) brightness(0.9); -webkit-backdrop-filter: blur(18px) brightness(0.9); border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05); border-radius: 20px; }
 
-        .glass-panel {
-            background: var(--glass-white);
-            backdrop-filter: blur(18px) brightness(0.9); 
-            -webkit-backdrop-filter: blur(18px) brightness(0.9);
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-        }
-
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            color: #fff; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1rem;
-            cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.3s ease; width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,0.05);
-        }
-        .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15), inset 0 0 15px rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
+        .btn-glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.3s ease; width: 100%; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,0.05); }
+        .btn-glass:hover { background: rgba(255, 255, 255, 0.25); box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15), inset 0 0 15px rgba(255,255,255,0.2); transform: translateY(-2px); }
         .btn-glass:active { transform: scale(0.97); }
 
-        /* ================= الهيدر الأصلي بتاعك ================= */
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin: 15px; }
         .logo img { max-height: 40px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
         .nav-links { display: none; } 
@@ -55,20 +25,13 @@
         .user-auth { display: flex; align-items: center; gap: 10px; }
         .btn-login { text-decoration: none; width: auto; padding: 8px 15px; font-size: 0.9rem;}
         
-        /* ================= القائمة المنسدلة للصورة ================= */
         .profile-wrapper { position: relative; display: flex; align-items: center; }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; cursor: pointer; transition: 0.3s;}
         .user-avatar:hover { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.3);}
         
-        .profile-dropdown {
-            display: none; position: absolute; top: 55px; left: 0; width: max-content; min-width: 160px;
-            padding: 10px; flex-direction: column; gap: 5px; z-index: 200; border-radius: 15px;
-        }
+        .profile-dropdown { display: none; position: absolute; top: 55px; /* right أو left حسب اللغة هنتحكم فيها من الـ JS */ width: max-content; min-width: 160px; padding: 10px; flex-direction: column; gap: 5px; z-index: 200; border-radius: 15px; }
         .profile-dropdown.show { display: flex; animation: popUp 0.2s ease-out; }
-        .dropdown-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #fff; 
-            cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 0.95rem;
-        }
+        .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 10px 15px; color: #fff; cursor: pointer; border-radius: 10px; transition: 0.2s; font-size: 0.95rem; }
         .dropdown-item:hover { background: rgba(255, 59, 48, 0.15); color: #ff3b30; }
 
         .section-title { text-align: center; font-size: 2rem; margin: 30px 0 15px; font-weight: 800;}
@@ -78,10 +41,8 @@
 
         .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 0 15px 40px; }
         .design-card { padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;}
-        
         .pkg-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); object-fit: contain; }
-        
-        .pkg-features { list-style: none; text-align: right; margin-bottom: 20px; padding: 0 5px; }
+        .pkg-features { list-style: none; text-align: start; margin-bottom: 20px; padding: 0 5px; }
         .pkg-features li { color: #d1d1d6; font-size: 0.9rem; margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4;}
         .pkg-features li::before { content: '✨'; font-size: 0.8rem; margin-top: 2px;}
 
@@ -95,7 +56,7 @@
         .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-top: 10px; color: #fff; box-shadow: none;}
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5);}
 
-        .order-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: right; }
+        .order-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: start; }
         .progress-bar { display: flex; gap: 6px; margin-top: 15px; }
         .step { flex: 1; height: 6px; border-radius: 3px; background: rgba(255,255,255,0.1); }
         .status-0 .step:nth-child(1) { background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.4);} 
@@ -103,7 +64,7 @@
         .status-2 .step { background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.6);} 
         .status-text { font-size: 0.85rem; margin-top: 8px; color: #a1a1a6; font-weight: bold;}
 
-        /* --- الإضافات للـ SPA (Tabs) --- */
+        /* SPA Additions */
         .hero { text-align: center; padding: 50px 20px 30px; }
         .hero h1 { font-size: 2.5rem; font-weight: 900; line-height: 1.3; margin: 15px 0; text-shadow: 0 0 15px rgba(255,255,255,0.3);}
         .hero p { color: #a1a1a6; font-size: 1.1rem; max-width: 600px; margin: 0 auto 25px; line-height: 1.6;}
@@ -120,11 +81,14 @@
         .port-card { border-radius: 15px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.3);}
         .port-img { width: 100%; height: auto; max-height: 400px; object-fit: contain; display: block; transition: 0.3s;}
         .port-card:hover .port-img { transform: scale(1.02); }
-        .port-info { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.9)); padding: 25px 15px 15px; text-align: right;}
+        .port-info { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(transparent, rgba(0,0,0,0.9)); padding: 25px 15px 15px; text-align: start;}
 
         .page-section { display: none; animation: fadeIn 0.4s ease-in-out; }
         .page-section.active-section { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Tweak for English Font */
+        html[dir="ltr"] * { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 
         @media (min-width: 768px) {
             header { padding: 20px 40px; margin: 20px 5%; }
@@ -146,38 +110,40 @@
             <a href="#" onclick="switchTab('home-section', this)"><img src="{{ url_for('static', filename='logo.png') }}" alt="Fnoon Studio"></a>
         </div>
         <nav class="nav-links" id="mainNav">
-            <a href="#" class="nav-btn active" onclick="switchTab('home-section', this); return false;">الرئيسية</a>
-            <a href="#" class="nav-btn" onclick="switchTab('portfolio-section', this); return false;">أحدث الأعمال</a>
-            <a href="#" class="nav-btn" onclick="switchTab('packages-section', this); return false;">الباقات</a>
+            <a href="#" class="nav-btn active" onclick="switchTab('home-section', this); return false;" data-i18n="nav_home">الرئيسية</a>
+            <a href="#" class="nav-btn" onclick="switchTab('portfolio-section', this); return false;" data-i18n="nav_portfolio">أحدث الأعمال</a>
+            <a href="#" class="nav-btn" onclick="switchTab('packages-section', this); return false;" data-i18n="nav_packages">الباقات</a>
         </nav>
         <div class="user-auth">
-            <span class="material-icons-round" onclick="alert('سيتم تفعيل اللغات قريباً!')" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="تغيير اللغة">language</span>
+            <span class="material-icons-round" onclick="toggleLanguage()" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s; margin-inline-end: 10px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="English / عربي">language</span>
             
-            <span class="material-icons-round" onclick="openOrders()" style="cursor:pointer; color:#a1a1a6; margin-left:10px; font-size: 1.8rem; transition: 0.3s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="طلباتي">inventory_2</span>
+            <span class="material-icons-round" onclick="openOrders()" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s; margin-inline-end: 10px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="طلباتي">inventory_2</span>
             
             {% if user %}
                 <div class="profile-wrapper">
                     <img src="{{ user.avatar }}" class="user-avatar" onclick="toggleProfileMenu()" title="الملف الشخصي">
                     <div id="profileDropdown" class="glass-panel profile-dropdown">
                         <div class="dropdown-item" onclick="confirmLogout()">
-                            <span class="material-icons-round">logout</span> تسجيل خروج
+                            <span class="material-icons-round">logout</span> <span data-i18n="btn_logout">تسجيل خروج</span>
                         </div>
                     </div>
                 </div>
             {% else %}
-                <a href="/login" class="btn-glass btn-login"><span class="material-icons-round" style="font-size:1.2rem;">login</span> دخول</a>
+                <a href="/login" class="btn-glass btn-login">
+                    <span class="material-icons-round" style="font-size:1.2rem;">login</span> <span data-i18n="btn_login">دخول</span>
+                </a>
             {% endif %}
         </div>
     </header>
 
     <div id="home-section" class="page-section active-section">
         <section class="hero">
-            <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem;">✨ تصاميم احترافية عالية الجودة</span>
-            <h1>اجعل مشروعك<br><span style="color: #fff;">يتألق مع فنون</span></h1>
-            <p>وجهتك الأولى للحصول على تصاميم احترافية لسيرفرات الديسكورد والبوسترات والشعارات والخلفيات وأكثر</p>
+            <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem;" data-i18n="hero_badge">✨ تصاميم احترافية عالية الجودة</span>
+            <h1><span data-i18n="hero_title1">اجعل مشروعك</span><br><span style="color: #fff;" data-i18n="hero_title2">يتألق مع فنون</span></h1>
+            <p data-i18n="hero_desc">وجهتك الأولى للحصول على تصاميم احترافية لسيرفرات الديسكورد والبوسترات والشعارات والخلفيات وأكثر</p>
             <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <button class="btn-glass" onclick="switchTab('portfolio-section', document.querySelectorAll('.nav-btn')[1])" style="width: auto; padding: 12px 25px;">تصفح الأقسام <span class="material-icons-round">palette</span></button>
-                <button class="btn-glass btn-outline" onclick="switchTab('packages-section', document.querySelectorAll('.nav-btn')[2])" style="width: auto; padding: 12px 25px;">الباقات <span class="material-icons-round">inventory_2</span></button>
+                <button class="btn-glass" onclick="switchTab('portfolio-section', document.querySelectorAll('.nav-btn')[1])" style="width: auto; padding: 12px 25px;"><span data-i18n="btn_browse">تصفح الأقسام</span> <span class="material-icons-round">palette</span></button>
+                <button class="btn-glass btn-outline" onclick="switchTab('packages-section', document.querySelectorAll('.nav-btn')[2])" style="width: auto; padding: 12px 25px;"><span data-i18n="nav_packages">الباقات</span> <span class="material-icons-round">inventory_2</span></button>
             </div>
         </section>
 
@@ -185,48 +151,48 @@
             <div class="stat-card glass-panel">
                 <span class="material-icons-round stat-icon" style="color: #32d74b;">groups</span>
                 <div class="stat-num">+2,500</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;">عميل سعيد</div>
+                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_clients">عميل سعيد</div>
             </div>
             <div class="stat-card glass-panel">
                 <span class="material-icons-round stat-icon" style="color: #c300ff;">workspace_premium</span>
                 <div class="stat-num">+5,000</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;">تصميم منجز</div>
+                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_designs">تصميم منجز</div>
             </div>
             <div class="stat-card glass-panel">
                 <span class="material-icons-round stat-icon" style="color: #ff9f0a;">star_rate</span>
                 <div class="stat-num">4.9/5</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;">تقييم العملاء</div>
+                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_rating">تقييم العملاء</div>
             </div>
             <div class="stat-card glass-panel">
                 <span class="material-icons-round stat-icon" style="color: #00b8d4;">bolt</span>
                 <div class="stat-num">24h</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;">متوسط التسليم</div>
+                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_delivery">متوسط التسليم</div>
             </div>
         </section>
 
         <section>
-            <h2 class="section-title">لماذا نحن الأفضل؟</h2>
-            <p style="text-align: center; color: #a1a1a6; margin-bottom: 25px;">نقدم لك أفضل الخدمات والمميزات</p>
+            <h2 class="section-title" data-i18n="feat_title">لماذا نحن الأفضل؟</h2>
+            <p style="text-align: center; color: #a1a1a6; margin-bottom: 25px;" data-i18n="feat_subtitle">نقدم لك أفضل الخدمات والمميزات</p>
             <div class="features-grid">
                 <div class="feature-card glass-panel">
                     <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">color_lens</span>
-                    <h3 style="margin-bottom: 5px;">تصاميم احترافية</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;">نستخدم أحدث الأدوات والتقنيات لإنشاء تصاميم فريدة وجذابة.</p>
+                    <h3 style="margin-bottom: 5px;" data-i18n="feat1_title">تصاميم احترافية</h3>
+                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat1_desc">نستخدم أحدث الأدوات والتقنيات لإنشاء تصاميم فريدة وجذابة.</p>
                 </div>
                 <div class="feature-card glass-panel">
                     <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">speed</span>
-                    <h3 style="margin-bottom: 5px;">تسليم سريع</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;">نلتزم بالمواعيد ونسلم العمل في أسرع وقت ممكن.</p>
+                    <h3 style="margin-bottom: 5px;" data-i18n="feat2_title">تسليم سريع</h3>
+                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat2_desc">نلتزم بالمواعيد ونسلم العمل في أسرع وقت ممكن.</p>
                 </div>
                 <div class="feature-card glass-panel">
                     <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">verified</span>
-                    <h3 style="margin-bottom: 5px;">جودة مضمونة</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;">نضمن لك أعلى مستويات الجودة في كل تصميم.</p>
+                    <h3 style="margin-bottom: 5px;" data-i18n="feat3_title">جودة مضمونة</h3>
+                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat3_desc">نضمن لك أعلى مستويات الجودة في كل تصميم.</p>
                 </div>
                 <div class="feature-card glass-panel">
                     <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">support_agent</span>
-                    <h3 style="margin-bottom: 5px;">دعم مستمر</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;">فريقنا متواجد دائماً للإجابة على استفساراتك.</p>
+                    <h3 style="margin-bottom: 5px;" data-i18n="feat4_title">دعم مستمر</h3>
+                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat4_desc">فريقنا متواجد دائماً للإجابة على استفساراتك.</p>
                 </div>
             </div>
         </section>
@@ -235,43 +201,40 @@
     <div id="portfolio-section" class="page-section">
         <div style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
             <button class="btn-glass" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05);" onclick="switchTab('home-section', document.querySelectorAll('.nav-btn')[0])">
-                <span class="material-icons-round" style="font-size: 1.2rem;">arrow_forward</span> رجوع للرئيسية
+                <span class="material-icons-round" style="font-size: 1.2rem; transform: scaleX(var(--arrow-dir, 1));">arrow_forward</span> <span data-i18n="btn_back">رجوع للرئيسية</span>
             </button>
         </div>
-
-        <h2 class="section-title">أحدث أعمالنا</h2>
-        <p style="text-align: center; color: #a1a1a6; margin-bottom: 30px;">تصفح تصاميمنا السابقة</p>
-        <div id="portfolioList" class="portfolio-grid">
-            <p style="text-align: center; color: #a1a1a6; width: 100%;">جاري تحميل الأعمال...</p>
-        </div>
+        <h2 class="section-title" data-i18n="port_title">أحدث أعمالنا</h2>
+        <p style="text-align: center; color: #a1a1a6; margin-bottom: 30px;" data-i18n="port_subtitle">تصفح تصاميمنا السابقة</p>
+        <div id="portfolioList" class="portfolio-grid"></div>
     </div>
 
     <div id="packages-section" class="page-section">
         <div style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px;">
             <button class="btn-glass" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05);" onclick="switchTab('home-section', document.querySelectorAll('.nav-btn')[0])">
-                <span class="material-icons-round" style="font-size: 1.2rem;">arrow_forward</span> رجوع للرئيسية
+                <span class="material-icons-round" style="font-size: 1.2rem; transform: scaleX(var(--arrow-dir, 1));">arrow_forward</span> <span data-i18n="btn_back">رجوع للرئيسية</span>
             </button>
         </div>
 
-        <h2 class="section-title">باقات السيرفرات</h2>
+        <h2 class="section-title" data-i18n="pkg_title">باقات السيرفرات</h2>
         <div class="gallery">
             <div class="design-card glass-panel" data-category="servers">
                 <div>
                     <img src="{{ url_for('static', filename='basic.png') }}" alt="Basic" class="pkg-img">
                     <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Basic</h3>
-                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">فئة التصميم البسيطة</p>
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="basic_desc">فئة التصميم البسيطة</p>
                     <ul class="pkg-features">
-                        <li>شعار أحرف أو رمزي (ثابت)</li>
-                        <li>1 بنر ديسكورد</li>
-                        <li>1 خط فاصل</li>
-                        <li>6 صور إنفو</li>
-                        <li>3 صور بوتات</li>
+                        <li data-i18n="f_logo_static">شعار أحرف أو رمزي (ثابت)</li>
+                        <li data-i18n="f_banner_1">1 بنر ديسكورد</li>
+                        <li data-i18n="f_line_1">1 خط فاصل</li>
+                        <li data-i18n="f_info_6">6 صور إنفو</li>
+                        <li data-i18n="f_bot_3">3 صور بوتات</li>
                     </ul>
                 </div>
                 <div>
-                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">750 ج.م</h3>
-                    <button class="btn-glass" onclick="openCheckout('باقة Basic', 750)">
-                        <span class="material-icons-round">shopping_cart</span> شراء الآن
+                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_750">750 ج.م</span></h3>
+                    <button class="btn-glass" onclick="openCheckout('Basic', 750)">
+                        <span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span>
                     </button>
                 </div>
             </div>
@@ -280,23 +243,23 @@
                 <div>
                     <img src="{{ url_for('static', filename='master.png') }}" alt="Master" class="pkg-img">
                     <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Master</h3>
-                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">فئة التصميم المتوسطة</p>
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="master_desc">فئة التصميم المتوسطة</p>
                     <ul class="pkg-features">
-                        <li>شعار أحرف أو رمزي (متحرك)</li>
-                        <li>1 بنر ديسكورد</li>
-                        <li>1 خط فاصل</li>
-                        <li>1 ترحيب ديسكورد</li>
-                        <li>1 بانر إنفايت (ثابت)</li>
-                        <li>1 صور علبة ألوان</li>
-                        <li>1 إنفو قوانين</li>
-                        <li>صور إنفو (لا نهائية)</li>
-                        <li>صور بوتات (لا نهائية)</li>
+                        <li data-i18n="f_logo_anim">شعار أحرف أو رمزي (متحرك)</li>
+                        <li data-i18n="f_banner_1">1 بنر ديسكورد</li>
+                        <li data-i18n="f_line_1">1 خط فاصل</li>
+                        <li data-i18n="f_welcome_1">1 ترحيب ديسكورد</li>
+                        <li data-i18n="f_invite_1">1 بانر إنفايت (ثابت)</li>
+                        <li data-i18n="f_colors_1">1 صور علبة ألوان</li>
+                        <li data-i18n="f_rules_1">1 إنفو قوانين</li>
+                        <li data-i18n="f_info_unl">صور إنفو (لا نهائية)</li>
+                        <li data-i18n="f_bot_unl">صور بوتات (لا نهائية)</li>
                     </ul>
                 </div>
                 <div>
-                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">1500 ج.م</h3>
-                    <button class="btn-glass" onclick="openCheckout('باقة Master', 1500)">
-                        <span class="material-icons-round">shopping_cart</span> شراء الآن
+                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_1500">1500 ج.م</span></h3>
+                    <button class="btn-glass" onclick="openCheckout('Master', 1500)">
+                        <span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span>
                     </button>
                 </div>
             </div>
@@ -305,24 +268,24 @@
                 <div>
                     <img src="{{ url_for('static', filename='premium.png') }}" alt="Premium" class="pkg-img">
                     <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Premium</h3>
-                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;">فئة التصميم الاحترافية</p>
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="premium_desc">فئة التصميم الاحترافية</p>
                     <ul class="pkg-features">
-                        <li>شعار أحرف أو رمزي (متحرك)</li>
-                        <li>1 بانر ديسكورد</li>
-                        <li>1 خط فاصل</li>
-                        <li>1 ترحيب ديسكورد</li>
-                        <li>1 بانر إنفايت (ثابت)</li>
-                        <li>1 صور علبة ألوان</li>
-                        <li>1 إنفو قوانين</li>
-                        <li>3 بنرات بروفايلات</li>
-                        <li>1 صورة افتتاحية</li>
-                        <li>صور إنفو وألعاب وبوتات (لا نهائية)</li>
+                        <li data-i18n="f_logo_anim">شعار أحرف أو رمزي (متحرك)</li>
+                        <li data-i18n="f_banner_1">1 بانر ديسكورد</li>
+                        <li data-i18n="f_line_1">1 خط فاصل</li>
+                        <li data-i18n="f_welcome_1">1 ترحيب ديسكورد</li>
+                        <li data-i18n="f_invite_1">1 بانر إنفايت (ثابت)</li>
+                        <li data-i18n="f_colors_1">1 صور علبة ألوان</li>
+                        <li data-i18n="f_rules_1">1 إنفو قوانين</li>
+                        <li data-i18n="f_profiles_3">3 بنرات بروفايلات</li>
+                        <li data-i18n="f_intro_1">1 صورة افتتاحية</li>
+                        <li data-i18n="f_all_unl">صور إنفو وألعاب وبوتات (لا نهائية)</li>
                     </ul>
                 </div>
                 <div>
-                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">2250 ج.م</h3>
-                    <button class="btn-glass" onclick="openCheckout('باقة Premium', 2250)">
-                        <span class="material-icons-round">shopping_cart</span> شراء الآن
+                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_2250">2250 ج.م</span></h3>
+                    <button class="btn-glass" onclick="openCheckout('Premium', 2250)">
+                        <span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span>
                     </button>
                 </div>
             </div>
@@ -332,12 +295,12 @@
     <div class="modal" id="logoutConfirmModal">
         <div class="modal-content glass-panel">
             <h2 style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <span class="material-icons-round" style="color: #ff3b30;">logout</span> هل أنت متأكد؟
+                <span class="material-icons-round" style="color: #ff3b30;">logout</span> <span data-i18n="modal_logout_title">هل أنت متأكد؟</span>
             </h2>
-            <p style="color: #a1a1a6; margin-bottom: 25px;">هل تريد فعلاً تسجيل الخروج من حسابك؟</p>
+            <p style="color: #a1a1a6; margin-bottom: 25px;" data-i18n="modal_logout_desc">هل تريد فعلاً تسجيل الخروج من حسابك؟</p>
             <div style="display: flex; gap: 10px;">
-                <button class="btn-glass" style="background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.3); color: #ff3b30;" onclick="window.location.href='/logout'">نعم، خروج</button>
-                <button class="btn-glass btn-outline" onclick="closeModals()">لا، تراجع</button>
+                <button class="btn-glass" style="background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.3); color: #ff3b30;" onclick="window.location.href='/logout'" data-i18n="btn_yes_logout">نعم، خروج</button>
+                <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_no_cancel">لا، تراجع</button>
             </div>
         </div>
     </div>
@@ -345,77 +308,164 @@
     <div class="modal" id="checkoutModal">
         <div class="modal-content glass-panel" id="checkoutForm">
             {% if user %}
-                <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round">account_balance_wallet</span> الدفع</h2>
-                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;">التحويل على فودافون كاش:<br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
-                
-                <input type="text" id="discordIdInput" class="input-glass" placeholder="أيدي الديسكورد (للتواصل)" value="{{ user.id }}">
-                <input type="tel" id="vCashNum" class="input-glass" placeholder="رقم الموبايل المحول منه">
-                
+                <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round">account_balance_wallet</span> <span data-i18n="modal_pay_title">الدفع</span></h2>
+                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
+                <input type="text" id="discordIdInput" class="input-glass" value="{{ user.id }}">
+                <input type="tel" id="vCashNum" class="input-glass">
                 <input type="hidden" id="pkgName">
                 <input type="hidden" id="pkgPrice">
-                <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> تأكيد الدفع</button>
-                <button class="btn-glass btn-outline" onclick="closeModals()">إلغاء</button>
+                <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> <span id="btnConfirmText" data-i18n="btn_confirm_pay">تأكيد الدفع</span></button>
+                <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_cancel">إلغاء</button>
             {% else %}
-                <h2 style="margin-bottom: 15px;">تنبيه</h2>
-                <p style="color: #a1a1a6; margin-bottom: 20px;">يجب تسجيل الدخول بواسطة ديسكورد لإتمام الشراء.</p>
-                <a href="/login" class="btn-glass" style="text-decoration:none;">تسجيل الدخول الآن</a>
-                <button class="btn-glass btn-outline" onclick="closeModals()">إغلاق</button>
+                <h2 style="margin-bottom: 15px;" data-i18n="modal_alert">تنبيه</h2>
+                <p style="color: #a1a1a6; margin-bottom: 20px;" data-i18n="modal_login_req">يجب تسجيل الدخول بواسطة ديسكورد لإتمام الشراء.</p>
+                <a href="/login" class="btn-glass" style="text-decoration:none;" data-i18n="btn_login_now">تسجيل الدخول الآن</a>
+                <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_close">إغلاق</button>
             {% endif %}
         </div>
 
         <div class="modal-content glass-panel" id="receiptBox" style="display:none;">
-            <h2 style="color: #fff; margin-bottom: 15px;"><span class="material-icons-round" style="vertical-align:middle;">check_circle</span> تم تسجيل طلبك!</h2>
-            <div class="glass-panel" style="padding:15px; margin:20px 0; text-align:right; font-size: 0.95rem; background:rgba(0,0,0,0.4);">
-                <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;">الباقة:</strong> <span id="recPkg"></span></p>
-                <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;">الرقم:</strong> <span id="recPhone"></span></p>
-                <p><strong style="color:#a1a1a6;">رقم الإيصال:</strong> <span id="recId" style="color: #fff; font-weight:bold; letter-spacing:1px;"></span></p>
+            <h2 style="color: #fff; margin-bottom: 15px;"><span class="material-icons-round" style="vertical-align:middle;">check_circle</span> <span data-i18n="modal_success">تم تسجيل طلبك!</span></h2>
+            <div class="glass-panel" style="padding:15px; margin:20px 0; text-align:start; font-size: 0.95rem; background:rgba(0,0,0,0.4);">
+                <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;" data-i18n="lbl_pkg">الباقة:</strong> <span id="recPkg"></span></p>
+                <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;" data-i18n="lbl_num">الرقم:</strong> <span id="recPhone"></span></p>
+                <p><strong style="color:#a1a1a6;" data-i18n="lbl_rec">رقم الإيصال:</strong> <span id="recId" style="color: #fff; font-weight:bold; letter-spacing:1px;"></span></p>
             </div>
             <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
-                <strong style="color: #fff; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">notifications_active</span> خطوة أخيرة!</strong>
-                <p style="margin-top:8px; color:#d1d1d6;">أرسل سكرين شوت للإيصال إلى <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace; border: 1px solid rgba(255,255,255,0.2);">946m</span> عبر ديسكورد.</p>
+                <strong style="color: #fff; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">notifications_active</span> <span data-i18n="modal_last_step">خطوة أخيرة!</span></strong>
+                <p style="margin-top:8px; color:#d1d1d6;" data-i18n="modal_send_ss">أرسل سكرين شوت للإيصال إلى <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace; border: 1px solid rgba(255,255,255,0.2);">946m</span> عبر ديسكورد.</p>
             </div>
-            <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()">العودة للمعرض</button>
+            <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()" data-i18n="btn_back_gal">العودة للمعرض</button>
         </div>
     </div>
 
     <div class="modal" id="ordersModal">
         <div class="modal-content glass-panel" style="max-height: 85vh; overflow-y: auto;">
-            <h2 style="color:#fff;"><span class="material-icons-round">inventory_2</span> طلباتي</h2>
+            <h2 style="color:#fff;"><span class="material-icons-round">inventory_2</span> <span data-i18n="nav_orders">طلباتي</span></h2>
             <div id="ordersList" style="margin-top: 20px;"></div>
-            <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()">إغلاق</button>
+            <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()" data-i18n="btn_close">إغلاق</button>
         </div>
     </div>
 
     <script>
-        // إظهار وإخفاء قائمة الملف الشخصي
-        function toggleProfileMenu() {
-            document.getElementById("profileDropdown").classList.toggle("show");
+        // =================== قاموس اللغات ===================
+        const translations = {
+            ar: {
+                nav_home: "الرئيسية", nav_portfolio: "أحدث الأعمال", nav_packages: "الباقات", nav_orders: "طلباتي",
+                btn_login: "دخول", btn_logout: "تسجيل خروج", btn_browse: "تصفح الأقسام", btn_back: "رجوع للرئيسية",
+                hero_badge: "✨ تصاميم احترافية عالية الجودة", hero_title1: "اجعل مشروعك", hero_title2: "يتألق مع فنون",
+                hero_desc: "وجهتك الأولى للحصول على تصاميم احترافية لسيرفرات الديسكورد والبوسترات والشعارات والخلفيات وأكثر",
+                stat_clients: "عميل سعيد", stat_designs: "تصميم منجز", stat_rating: "تقييم العملاء", stat_delivery: "متوسط التسليم",
+                feat_title: "لماذا نحن الأفضل؟", feat_subtitle: "نقدم لك أفضل الخدمات والمميزات",
+                feat1_title: "تصاميم احترافية", feat1_desc: "نستخدم أحدث الأدوات والتقنيات لإنشاء تصاميم فريدة وجذابة.",
+                feat2_title: "تسليم سريع", feat2_desc: "نلتزم بالمواعيد ونسلم العمل في أسرع وقت ممكن.",
+                feat3_title: "جودة مضمونة", feat3_desc: "نضمن لك أعلى مستويات الجودة في كل تصميم.",
+                feat4_title: "دعم مستمر", feat4_desc: "فريقنا متواجد دائماً للإجابة على استفساراتك.",
+                port_title: "أحدث أعمالنا", port_subtitle: "تصفح تصاميمنا السابقة",
+                pkg_title: "باقات السيرفرات", basic_desc: "فئة التصميم البسيطة", master_desc: "فئة التصميم المتوسطة", premium_desc: "فئة التصميم الاحترافية",
+                f_logo_static: "شعار أحرف أو رمزي (ثابت)", f_banner_1: "1 بنر ديسكورد", f_line_1: "1 خط فاصل", f_info_6: "6 صور إنفو", f_bot_3: "3 صور بوتات",
+                f_logo_anim: "شعار أحرف أو رمزي (متحرك)", f_welcome_1: "1 ترحيب ديسكورد", f_invite_1: "1 بانر إنفايت (ثابت)", f_colors_1: "1 صور علبة ألوان", f_rules_1: "1 إنفو قوانين", f_info_unl: "صور إنفو (لا نهائية)", f_bot_unl: "صور بوتات (لا نهائية)",
+                f_profiles_3: "3 بنرات بروفايلات", f_intro_1: "1 صورة افتتاحية", f_all_unl: "صور إنفو وألعاب وبوتات (لا نهائية)",
+                price_750: "750 ج.م", price_1500: "1500 ج.م", price_2250: "2250 ج.م", btn_buy: "شراء الآن",
+                modal_logout_title: "هل أنت متأكد؟", modal_logout_desc: "هل تريد فعلاً تسجيل الخروج من حسابك؟", btn_yes_logout: "نعم، خروج", btn_no_cancel: "لا، تراجع",
+                modal_pay_title: "الدفع", modal_pay_vca: "التحويل على فودافون كاش:", btn_confirm_pay: "تأكيد الدفع", btn_cancel: "إلغاء",
+                modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول بواسطة ديسكورد لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
+                modal_success: "تم تسجيل طلبك!", lbl_pkg: "الباقة:", lbl_num: "الرقم:", lbl_rec: "رقم الإيصال:",
+                modal_last_step: "خطوة أخيرة!", modal_send_ss: "أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.", btn_back_gal: "العودة للمعرض",
+                place_disc: "أيدي الديسكورد (للتواصل)", place_phone: "رقم الموبايل المحول منه",
+                msg_loading: "جاري التحميل...", msg_no_port: "لم يتم إضافة أعمال بعد.", msg_no_orders: "لا توجد طلبات سابقة.",
+                status_0: "قيد الانتظار", status_1: "جاري العمل", status_2: "مكتمل", lbl_order_id: "رقم الطلب:",
+                err_data: "يرجى إكمال البيانات!", err_conn: "حدث خطأ في الاتصال."
+            },
+            en: {
+                nav_home: "Home", nav_portfolio: "Portfolio", nav_packages: "Packages", nav_orders: "My Orders",
+                btn_login: "Login", btn_logout: "Logout", btn_browse: "Browse Categories", btn_back: "Back to Home",
+                hero_badge: "✨ Premium Quality Designs", hero_title1: "Make your project", hero_title2: "Shine with Fnoon",
+                hero_desc: "Your primary destination for professional Discord server designs, posters, logos, wallpapers, and more.",
+                stat_clients: "Happy Clients", stat_designs: "Completed Designs", stat_rating: "Customer Rating", stat_delivery: "Avg. Delivery",
+                feat_title: "Why Choose Us?", feat_subtitle: "We offer you the best services and features",
+                feat1_title: "Professional Designs", feat1_desc: "We use the latest tools and tech to create unique designs.",
+                feat2_title: "Fast Delivery", feat2_desc: "We respect deadlines and deliver as fast as possible.",
+                feat3_title: "Guaranteed Quality", feat3_desc: "We guarantee the highest quality in every design.",
+                feat4_title: "24/7 Support", feat4_desc: "Our team is always available to answer your questions.",
+                port_title: "Our Latest Work", port_subtitle: "Browse our previous designs",
+                pkg_title: "Server Packages", basic_desc: "Basic Design Tier", master_desc: "Medium Design Tier", premium_desc: "Pro Design Tier",
+                f_logo_static: "Static Letter/Symbol Logo", f_banner_1: "1 Discord Banner", f_line_1: "1 Divider", f_info_6: "6 Info Images", f_bot_3: "3 Bot Images",
+                f_logo_anim: "Animated Letter/Symbol Logo", f_welcome_1: "1 Discord Welcome", f_invite_1: "1 Static Invite Banner", f_colors_1: "1 Color Palette", f_rules_1: "1 Rules Info", f_info_unl: "Unlimited Info Images", f_bot_unl: "Unlimited Bot Images",
+                f_profiles_3: "3 Profile Banners", f_intro_1: "1 Intro Image", f_all_unl: "Unlimited Info, Games & Bot Images",
+                price_750: "750 EGP", price_1500: "1500 EGP", price_2250: "2250 EGP", btn_buy: "Buy Now",
+                modal_logout_title: "Are you sure?", modal_logout_desc: "Do you really want to log out of your account?", btn_yes_logout: "Yes, Logout", btn_no_cancel: "No, Cancel",
+                modal_pay_title: "Checkout", modal_pay_vca: "Transfer to Vodafone Cash:", btn_confirm_pay: "Confirm Order", btn_cancel: "Cancel",
+                modal_alert: "Alert", modal_login_req: "You must login via Discord to purchase.", btn_login_now: "Login Now", btn_close: "Close",
+                modal_success: "Order Submitted!", lbl_pkg: "Package:", lbl_num: "Number:", lbl_rec: "Receipt ID:",
+                modal_last_step: "One last step!", modal_send_ss: "Send a screenshot of the receipt to 946m via Discord.", btn_back_gal: "Back to Gallery",
+                place_disc: "Discord ID (Contact)", place_phone: "Transfer Phone Number",
+                msg_loading: "Loading...", msg_no_port: "No portfolio items added yet.", msg_no_orders: "No previous orders.",
+                status_0: "Pending", status_1: "In Progress", status_2: "Completed", lbl_order_id: "Order ID:",
+                err_data: "Please fill all fields!", err_conn: "Connection error."
+            }
+        };
+
+        let currentLang = 'ar';
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'ar' ? 'en' : 'ar';
+            const dict = translations[currentLang];
+            
+            // تغيير اتجاه الصفحة
+            document.documentElement.lang = currentLang;
+            document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+            
+            // عكس اتجاه الأسهم
+            document.documentElement.style.setProperty('--arrow-dir', currentLang === 'ar' ? '1' : '-1');
+
+            // تحديث النصوص
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if(dict[key]) el.innerHTML = dict[key]; // استخدمنا innerHTML بدل text عشان لو فيه تنسيق جوه
+            });
+
+            // تحديث الـ Placeholders
+            document.getElementById('discordIdInput').placeholder = dict['place_disc'];
+            document.getElementById('vCashNum').placeholder = dict['place_phone'];
+
+            // إعادة تحميل البيانات الديناميكية عشان تترجم
+            loadPortfolio();
+            if(document.getElementById('ordersModal').style.display === 'flex') openOrders();
         }
 
-        // إخفاء القائمة لو الزبون داس في أي مكان فاضي في الشاشة
+        // =================== القائمة المنسدلة للصورة ===================
+        function toggleProfileMenu() {
+            document.getElementById("profileDropdown").classList.toggle("show");
+            // تظبيط مكان القائمة حسب اللغة
+            if(currentLang === 'en') {
+                document.getElementById("profileDropdown").style.left = "auto";
+                document.getElementById("profileDropdown").style.right = "0";
+            } else {
+                document.getElementById("profileDropdown").style.right = "auto";
+                document.getElementById("profileDropdown").style.left = "0";
+            }
+        }
+
         window.onclick = function(event) {
             if (!event.target.matches('.user-avatar')) {
                 var dropdowns = document.getElementsByClassName("profile-dropdown");
                 for (var i = 0; i < dropdowns.length; i++) {
                     var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
-                    }
+                    if (openDropdown.classList.contains('show')) openDropdown.classList.remove('show');
                 }
             }
         }
 
-        // فتح نافذة التأكيد للخروج
         function confirmLogout() {
             document.getElementById("profileDropdown").classList.remove("show");
             document.getElementById("logoutConfirmModal").style.display = "flex";
         }
 
-        // دالة التنقل بين الصفحات بنظام الـ Tabs
+        // =================== الـ SPA (التنقل) ===================
         function switchTab(sectionId, btnElement) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-section'));
             document.getElementById(sectionId).classList.add('active-section');
-            
             if(btnElement) {
                 document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
                 btnElement.classList.add('active');
@@ -423,50 +473,42 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // =================== الوظائف الديناميكية ===================
         async function loadPortfolio() {
+            const dict = translations[currentLang];
+            const container = document.getElementById('portfolioList');
             try {
                 const res = await fetch('/api/portfolio');
                 const items = await res.json();
-                const container = document.getElementById('portfolioList');
-                
                 if(items.length === 0) {
-                    container.innerHTML = '<p style="text-align: center; color: #a1a1a6; width: 100%;">لم يتم إضافة أعمال بعد.</p>';
+                    container.innerHTML = `<p style="text-align: center; color: #a1a1a6; width: 100%; grid-column: 1 / -1;">${dict['msg_no_port']}</p>`;
                     return;
                 }
-
-                container.innerHTML = items.map(item => `
+                container.innerHTML = items.map(i => `
                     <div class="port-card">
-                        <img src="${item.image_url}" class="port-img" alt="${item.title}">
+                        <img src="${i.image_url}" class="port-img">
                         <div class="port-info">
-                            <h4 style="color:#fff; margin-bottom: 5px; font-size: 1.1rem;">${item.title}</h4>
-                            <span style="color:#a1a1a6; font-size:0.8rem; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px;">${item.category}</span>
+                            <h4 style="color:#fff; font-size: 1.1rem; margin-bottom: 5px;">${i.title}</h4>
+                            <span style="color:#a1a1a6; font-size:0.8rem; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 8px;">${i.category}</span>
                         </div>
                     </div>
                 `).join('');
-            } catch(e) { console.error("Error loading portfolio"); }
+            } catch(e) { container.innerHTML = `<p style="text-align:center; color:#ff3b30;">${dict['err_conn']}</p>`; }
         }
         
-        loadPortfolio();
+        // خليناها تحمل مرة واحدة في الأول
+        window.onload = loadPortfolio;
 
-        function filterDesigns(category, btnElement) {
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
-
-            document.querySelectorAll('.design-card').forEach(card => {
-                if(category === 'all' || card.getAttribute('data-category') === category) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-
-        function openCheckout(pkg, price) {
+        function openCheckout(n, p) {
             document.getElementById('checkoutModal').style.display = 'flex';
             document.getElementById('checkoutForm').style.display = 'block';
             document.getElementById('receiptBox').style.display = 'none';
-            document.getElementById('pkgName').value = pkg;
-            document.getElementById('pkgPrice').value = price;
+            document.getElementById('pkgName').value = n;
+            document.getElementById('pkgPrice').value = p;
+            
+            // تظبيط الـ Placeholder المبدئي
+            document.getElementById('discordIdInput').placeholder = translations[currentLang]['place_disc'];
+            document.getElementById('vCashNum').placeholder = translations[currentLang]['place_phone'];
         }
 
         function closeModals() {
@@ -474,29 +516,24 @@
         }
 
         async function submitOrder() {
+            const dict = translations[currentLang];
             const phone = document.getElementById('vCashNum').value;
             const pkg = document.getElementById('pkgName').value;
             const price = document.getElementById('pkgPrice').value;
             const discordId = document.getElementById('discordIdInput').value;
 
-            if(!discordId) return alert("يرجى إدخال أيدي الديسكورد للتواصل!");
-            if(!phone) return alert("يرجى إدخال رقم الكاش!");
+            if(!discordId || !phone) return alert(dict['err_data']);
 
-            const btn = document.querySelector('#checkoutForm .btn-glass');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="material-icons-round" style="animation: rotate 1s linear infinite;">sync</span> جاري التأكيد...';
-            btn.style.pointerEvents = 'none';
+            const btnText = document.getElementById('btnConfirmText');
+            const originalText = btnText.innerText;
+            btnText.innerText = dict['msg_loading'];
+            document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'none';
 
             try {
                 const res = await fetch('/api/checkout', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        vodafone_number: phone, 
-                        package_name: pkg, 
-                        price: price,
-                        contact_discord_id: discordId
-                    })
+                    body: JSON.stringify({ vodafone_number: phone, package_name: pkg, price: price, contact_discord_id: discordId })
                 });
                 const data = await res.json();
 
@@ -510,41 +547,42 @@
                     alert(data.message);
                 }
             } catch (err) {
-                alert("حدث خطأ في الاتصال بالسيرفر.");
+                alert(dict['err_conn']);
             } finally {
-                btn.innerHTML = originalText;
-                btn.style.pointerEvents = 'auto';
+                btnText.innerText = originalText;
+                document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'auto';
             }
         }
 
         async function openOrders() {
+            const dict = translations[currentLang];
             document.getElementById('ordersModal').style.display = 'flex';
             const list = document.getElementById('ordersList');
-            list.innerHTML = '<p style="color:#a1a1a6;"><span class="material-icons-round" style="animation: rotate 1s linear infinite; vertical-align:middle;">sync</span> جاري التحميل...</p>';
+            list.innerHTML = `<p style="color:#a1a1a6; text-align:center;"><span class="material-icons-round" style="animation: rotate 1s linear infinite; vertical-align:middle;">sync</span> ${dict['msg_loading']}</p>`;
             
             try {
                 const res = await fetch('/api/my_orders');
                 const orders = await res.json();
                 
                 if(orders.length === 0) {
-                    list.innerHTML = '<p style="color:#a1a1a6; padding: 20px 0;">لا توجد طلبات سابقة.</p>';
+                    list.innerHTML = `<p style="color:#a1a1a6; padding: 20px 0; text-align:center;">${dict['msg_no_orders']}</p>`;
                     return;
                 }
 
                 list.innerHTML = orders.map(o => {
-                    let statusText = o.status === 0 ? "قيد الانتظار" : o.status === 1 ? "جاري العمل" : "مكتمل";
+                    let sText = o.status === 0 ? dict['status_0'] : o.status === 1 ? dict['status_1'] : dict['status_2'];
                     return `
                     <div class="order-card">
                         <h3 style="color:#fff; font-size: 1.1rem; margin-bottom: 5px;">${o.package_name}</h3>
-                        <p style="color:#a1a1a6; font-size:0.85rem;">رقم الطلب: #${o._id ? o._id.substring(18).toUpperCase() : '...'}</p>
+                        <p style="color:#a1a1a6; font-size:0.85rem;">${dict['lbl_order_id']} #${o.short_id}</p>
                         <div class="progress-bar status-${o.status}">
                             <div class="step"></div><div class="step"></div><div class="step"></div>
                         </div>
-                        <div class="status-text">${statusText}</div>
+                        <div class="status-text">${sText}</div>
                     </div>`;
                 }).join('');
             } catch (err) {
-                list.innerHTML = '<p style="color:#fff;">حدث خطأ في جلب الطلبات.</p>';
+                list.innerHTML = `<p style="color:#ff3b30; text-align:center;">${dict['err_conn']}</p>`;
             }
         }
     </script>
