@@ -35,7 +35,7 @@
         .dropdown-item:hover { background: rgba(255, 59, 48, 0.15); color: #ff3b30; }
 
         .section-title { text-align: center; font-size: 2rem; margin: 30px 0 15px; font-weight: 800;}
-        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 0 15px 40px; }
+        .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; padding: 0 15px 40px; transition: 0.3s; }
         .design-card { padding: 20px; text-align: center; display: flex; flex-direction: column; justify-content: space-between;}
         .pkg-img { width: 100%; height: auto; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); object-fit: contain; }
         .pkg-features { list-style: none; text-align: start; margin-bottom: 20px; padding: 0 5px; }
@@ -48,6 +48,10 @@
 
         .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;}
         .input-glass:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1);}
+
+        select.input-glass { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 15px center; cursor: pointer; }
+        html[dir="ltr"] select.input-glass { background-position: right 15px center; }
+        select.input-glass option { background: #1e1e1e; color: #fff; text-align: center; }
 
         .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-top: 10px; color: #fff; box-shadow: none;}
         .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5);}
@@ -215,7 +219,7 @@
 
             <div style="position: relative;">
                 <button class="btn-glass" id="selectedCatBtn" onclick="document.getElementById('catMenu').classList.toggle('show')" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
-                    <span id="catBtnText" data-i18n="opt_select">اختر نوع التصميم</span> <span class="material-icons-round" style="font-size: 1.2rem; margin-inline-start: 5px;">expand_more</span>
+                    <span id="catBtnText" data-i18n="opt_discord">تصاميم ديسكورد</span> <span class="material-icons-round" style="font-size: 1.2rem; margin-inline-start: 5px;">expand_more</span>
                 </button>
                 
                 <div id="catMenu" class="glass-panel profile-dropdown" style="top: 45px; left: 0; right: auto; width: max-content; padding: 10px;">
@@ -230,7 +234,18 @@
                 </div>
             </div>
         </div>
+
         <h2 class="section-title" data-i18n="pkg_title">باقات السيرفرات</h2>
+        
+        <div id="unavailableMsg" class="glass-panel" style="display: none; text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto 30px;">
+            <span class="material-icons-round" style="font-size: 3.5rem; color: #ff9f0a; margin-bottom: 15px; display: block;">construction</span>
+            <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.4rem;">
+                <span data-i18n="msg_unavailable_part1">عذراً، قسم</span>
+                <span id="unavailCatName" style="color: #ff9f0a; margin: 0 5px;"></span>
+            </h3>
+            <p style="color: #a1a1a6; font-size: 1rem;" data-i18n="msg_unavailable_part2">غير متاح حالياً وسيتم تحديد أسعاره قريباً.</p>
+        </div>
+
         <div class="gallery">
             <div class="design-card glass-panel" data-category="servers">
                 <div>
@@ -323,9 +338,24 @@
         <div class="modal-content glass-panel" id="checkoutForm">
             {% if user %}
                 <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round">account_balance_wallet</span> <span data-i18n="modal_pay_title">الدفع</span></h2>
-                <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
-                <input type="text" id="discordIdInput" class="input-glass" value="{{ user.id }}">
-                <input type="tel" id="vCashNum" class="input-glass">
+                
+                <select id="paymentMethodInput" class="input-glass" onchange="checkPaymentMethod()" style="margin-bottom: 20px;">
+                    <option value="" disabled selected data-i18n="opt_pay_select">اختر طريقة الدفع</option>
+                    <option value="vodafone">Vodafone Cash</option>
+                    <option value="paypal" disabled data-i18n="pay_paypal">PayPal (غير متاح)</option>
+                    <option value="stc" disabled data-i18n="pay_stc">STC Pay (غير متاح)</option>
+                    <option value="urpay" disabled data-i18n="pay_urpay">UrPay (غير متاح)</option>
+                    <option value="rajhi" disabled data-i18n="pay_rajhi">الراجحي (غير متاح)</option>
+                    <option value="binance" disabled data-i18n="pay_binance">Binance (غير متاح)</option>
+                    <option value="instapay" disabled data-i18n="pay_instapay">Instapay (غير متاح)</option>
+                </select>
+
+                <div id="vodafoneDetails" style="display: none; width: 100%;">
+                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
+                    <input type="text" id="discordIdInput" class="input-glass" value="{{ user.id }}">
+                    <input type="tel" id="vCashNum" class="input-glass">
+                </div>
+
                 <input type="hidden" id="pkgName">
                 <input type="hidden" id="pkgPrice">
                 <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> <span id="btnConfirmText" data-i18n="btn_confirm_pay">تأكيد الدفع</span></button>
@@ -389,9 +419,11 @@
                 opt_select: "اختر نوع التصميم", opt_discord: "تصاميم ديسكورد", opt_stream: "تصاميم استريمنج",
                 opt_fivem: "تصاميم فايف ام", opt_youtube: "تصاميم يوتيوب", opt_social: "تصاميم سوشيال ميديا",
                 opt_sala: "تصميم sala", opt_web: "تصميم مواقع", opt_logo: "تصميم شعارات",
+                msg_unavailable_part1: "عذراً، قسم ", msg_unavailable_part2: " غير متاح حالياً وسيتم تحديد أسعاره قريباً.",
+                opt_pay_select: "اختر طريقة الدفع", pay_paypal: "PayPal (غير متاح)", pay_stc: "STC Pay (غير متاح)", pay_urpay: "UrPay (غير متاح)", pay_rajhi: "الراجحي (غير متاح)", pay_binance: "Binance (غير متاح)", pay_instapay: "Instapay (غير متاح)",
                 msg_loading: "جاري التحميل...", msg_no_port: "لم يتم إضافة أعمال بعد.", msg_no_orders: "لا توجد طلبات سابقة.",
                 status_0: "قيد الانتظار", status_1: "جاري العمل", status_2: "مكتمل", lbl_order_id: "رقم الطلب:",
-                err_data: "يرجى إكمال البيانات!", err_type: "يرجى اختيار نوع التصميم من الأعلى!", err_conn: "حدث خطأ في الاتصال."
+                err_data: "يرجى إكمال البيانات!", err_pay: "يرجى اختيار طريقة الدفع أولاً!", err_conn: "حدث خطأ في الاتصال."
             },
             en: {
                 nav_home: "Home", nav_portfolio: "Portfolio", nav_packages: "Packages", nav_orders: "My Orders",
@@ -419,14 +451,16 @@
                 opt_select: "Select Category", opt_discord: "Discord Designs", opt_stream: "Streaming Designs",
                 opt_fivem: "FiveM Designs", opt_youtube: "YouTube Designs", opt_social: "Social Media Designs",
                 opt_sala: "Sala Designs", opt_web: "Website Designs", opt_logo: "Logo Designs",
+                msg_unavailable_part1: "Sorry, ", msg_unavailable_part2: " is currently unavailable. Prices will be set soon.",
+                opt_pay_select: "Select Payment Method", pay_paypal: "PayPal (Unavailable)", pay_stc: "STC Pay (Unavailable)", pay_urpay: "UrPay (Unavailable)", pay_rajhi: "Al Rajhi (Unavailable)", pay_binance: "Binance (Unavailable)", pay_instapay: "Instapay (Unavailable)",
                 msg_loading: "Loading...", msg_no_port: "No portfolio items added yet.", msg_no_orders: "No previous orders.",
                 status_0: "Pending", status_1: "In Progress", status_2: "Completed", lbl_order_id: "Order ID:",
-                err_data: "Please fill all fields!", err_type: "Please select a design category from the top menu!", err_conn: "Connection error."
+                err_data: "Please fill all fields!", err_pay: "Please select a payment method first!", err_conn: "Connection error."
             }
         };
 
         let currentLang = 'ar';
-        let activeDesignTypeI18n = ""; // المتغير اللي بيحفظ النوع اللي الزبون اختاره
+        let activeDesignTypeI18n = 'opt_discord'; // ديسكورد هو الافتراضي
 
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
@@ -443,12 +477,14 @@
 
             document.getElementById('discordIdInput').placeholder = dict['place_disc'];
             document.getElementById('vCashNum').placeholder = dict['place_phone'];
+            
+            // تحديث رسالة القسم المغلق لو موجودة
+            chooseCat(activeDesignTypeI18n);
 
             loadPortfolio();
             if(document.getElementById('ordersModal').style.display === 'flex') openOrders();
         }
 
-        // ================= إخفاء وإظهار القوائم =================
         function toggleProfileMenu() {
             document.getElementById("profileDropdown").classList.toggle("show");
             if(currentLang === 'en') {
@@ -465,7 +501,6 @@
                 var pMenu = document.getElementById("profileDropdown");
                 if (pMenu && pMenu.classList.contains('show')) pMenu.classList.remove('show');
             }
-            // قفل قائمة التصنيفات لو داس بره
             if (!event.target.closest('#selectedCatBtn')) {
                 var cMenu = document.getElementById("catMenu");
                 if (cMenu && cMenu.classList.contains('show')) cMenu.classList.remove('show');
@@ -487,13 +522,27 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ================= اختيار الكاتيجوري من الزرار الجديد =================
+        // ================= اختيار الكاتيجوري وإخفاء الباقات =================
         function chooseCat(i18nKey) {
             activeDesignTypeI18n = i18nKey;
             const btnText = document.getElementById('catBtnText');
             btnText.setAttribute('data-i18n', i18nKey);
             btnText.innerText = translations[currentLang][i18nKey];
             document.getElementById('catMenu').classList.remove('show');
+
+            const gallery = document.querySelector('.gallery');
+            const unavailMsg = document.getElementById('unavailableMsg');
+            const unavailCatName = document.getElementById('unavailCatName');
+
+            // لو اختار ديسكورد نعرض الباقات، لو حاجة تانية نخفيها ونعرض الرسالة
+            if(i18nKey === 'opt_discord') {
+                gallery.style.display = 'grid';
+                unavailMsg.style.display = 'none';
+            } else {
+                gallery.style.display = 'none';
+                unavailCatName.innerText = translations[currentLang][i18nKey];
+                unavailMsg.style.display = 'block';
+            }
         }
 
         async function loadPortfolio() {
@@ -520,25 +569,33 @@
         
         window.onload = loadPortfolio;
 
-        function openCheckout(n, p) {
-            // لو الزبون مختارش تصنيف من الزرار اللي فوق، هنبهه
-            if (!activeDesignTypeI18n) {
-                alert(translations[currentLang]['err_type']);
-                return;
+        // ================= دالة الدفع الجديدة =================
+        function checkPaymentMethod() {
+            const method = document.getElementById('paymentMethodInput').value;
+            // إظهار خانة الرقم لو اختار فودافون بس
+            if(method === 'vodafone') {
+                document.getElementById('vodafoneDetails').style.display = 'block';
+            } else {
+                document.getElementById('vodafoneDetails').style.display = 'none';
             }
+        }
 
+        function openCheckout(n, p) {
             document.getElementById('checkoutModal').style.display = 'flex';
             document.getElementById('checkoutForm').style.display = 'block';
             document.getElementById('receiptBox').style.display = 'none';
             
-            // دمج اسم الباقة مع الكاتيجوري اللي اختارها (بالعربي عشان الداتا بيز)
+            // تصفير القائمة والرقم كل ما يفتح النافذة
+            document.getElementById('paymentMethodInput').value = "";
+            document.getElementById('vodafoneDetails').style.display = 'none';
+            document.getElementById('vCashNum').value = "";
+
             const catNameAr = translations['ar'][activeDesignTypeI18n];
             document.getElementById('pkgName').value = n + " (" + catNameAr + ")";
             document.getElementById('pkgPrice').value = p;
             
             document.getElementById('discordIdInput').placeholder = translations[currentLang]['place_disc'];
             document.getElementById('vCashNum').placeholder = translations[currentLang]['place_phone'];
-            document.getElementById('vCashNum').value = ""; // تفريغ الرقم
         }
 
         function closeModals() {
@@ -547,8 +604,12 @@
 
         async function submitOrder() {
             const dict = translations[currentLang];
+            const payMethod = document.getElementById('paymentMethodInput').value;
+            
+            if(!payMethod) return alert(dict['err_pay']); // لازم يختار طريقة الدفع
+
             const phone = document.getElementById('vCashNum').value;
-            const pkg = document.getElementById('pkgName').value; // ده بقى جواه الباقة + الكاتيجوري
+            const pkg = document.getElementById('pkgName').value;
             const price = document.getElementById('pkgPrice').value;
             const discordId = document.getElementById('discordIdInput').value;
 
@@ -570,7 +631,7 @@
                 if(data.success) {
                     document.getElementById('checkoutForm').style.display = 'none';
                     document.getElementById('receiptBox').style.display = 'block';
-                    document.getElementById('recPkg').innerText = pkg; // هيظهر مثلا: Premium (تصاميم استريمنج)
+                    document.getElementById('recPkg').innerText = pkg; 
                     document.getElementById('recPhone').innerText = phone;
                     document.getElementById('recId').innerText = "#" + data.order_id;
                 } else {
