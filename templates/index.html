@@ -17,15 +17,15 @@
         .btn-glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: #fff; padding: 12px; border-radius: 12px; font-weight: bold; font-size: 1rem; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; transition: all 0.3s ease; width: 100%; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,0.05); }
         .btn-glass:hover { background: rgba(255, 255, 255, 0.25); box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15), inset 0 0 15px rgba(255,255,255,0.2); transform: translateY(-2px); }
         .btn-glass:active { transform: scale(0.97); }
+        .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-top: 10px; color: #fff; box-shadow: none;}
+        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5);}
 
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; margin: 15px; }
         .logo img { max-height: 40px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); }
         .nav-links { display: none; } 
         
         .user-auth { display: flex; align-items: center; gap: 10px; }
-        .btn-login { text-decoration: none; width: auto; padding: 8px 15px; font-size: 0.9rem;}
-        
-        .profile-wrapper { position: relative; display: flex; align-items: center; }
+        .profile-wrapper { position: relative; display: flex; align-items: center; gap: 10px; }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; cursor: pointer; transition: 0.3s;}
         .user-avatar:hover { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.3);}
         
@@ -49,12 +49,17 @@
         .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;}
         .input-glass:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1);}
 
-        select.input-glass { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffffff'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: left 15px center; cursor: pointer; }
-        html[dir="ltr"] select.input-glass { background-position: right 15px center; }
-        select.input-glass option { background: #1e1e1e; color: #fff; text-align: center; }
-
-        .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.3); margin-top: 10px; color: #fff; box-shadow: none;}
-        .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5);}
+        /* القائمة المنسدلة المخصصة لطرق الدفع */
+        .custom-pay-dropdown { position: relative; width: 100%; margin-bottom: 15px; text-align: start; }
+        .pay-display { padding: 14px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);}
+        .pay-display:hover { background: rgba(255,255,255,0.05); }
+        .pay-list { display: none; position: absolute; top: 100%; left: 0; width: 100%; background: rgba(30,30,30,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; margin-top: 5px; z-index: 100; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .pay-list.show { display: block; animation: popUp 0.2s; }
+        .pay-item { padding: 12px 20px; color: #fff; cursor: pointer; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05);}
+        .pay-item:last-child { border-bottom: none; }
+        .pay-item:hover:not(.disabled) { background: rgba(255,255,255,0.1); }
+        .pay-item.disabled { color: #888; cursor: not-allowed; opacity: 0.6; }
+        .pay-status { font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 5px; }
 
         .order-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); padding: 15px; border-radius: 15px; margin-bottom: 15px; text-align: start; }
         .progress-bar { display: flex; gap: 6px; margin-top: 15px; }
@@ -87,7 +92,6 @@
         .page-section.active-section { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* تعديلات الخطوط وحل مشكلة الأيقونات */
         html[dir="ltr"] *:not(.material-icons-round) { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         .material-icons-round { font-family: 'Material Icons Round' !important; }
 
@@ -117,12 +121,17 @@
         </nav>
         <div class="user-auth">
             <span class="material-icons-round" onclick="toggleLanguage()" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s; margin-inline-end: 10px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="English / عربي">language</span>
-            
             <span class="material-icons-round" onclick="openOrders()" style="cursor:pointer; color:#a1a1a6; font-size: 1.8rem; transition: 0.3s; margin-inline-end: 10px;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#a1a1a6'" title="طلباتي">inventory_2</span>
             
             {% if user %}
                 <div class="profile-wrapper">
-                    <img src="{{ user.avatar }}" class="user-avatar" onclick="toggleProfileMenu()" title="الملف الشخصي">
+                    <div style="display: flex; flex-direction: column; text-align: end; margin-inline-end: 5px;">
+                        <span style="font-size: 0.8rem; font-weight: bold; color: #fff;">{{ user.username }}</span>
+                        <span style="font-size: 0.7rem; color: #a1a1a6;" data-i18n="logged_via_{{ user.provider }}">
+                            {% if user.provider == 'google' %}مُسجل عبر جوجل{% else %}مُسجل عبر ديسكورد{% endif %}
+                        </span>
+                    </div>
+                    <img src="{{ user.avatar }}" referrerpolicy="no-referrer" class="user-avatar" onclick="toggleProfileMenu()" title="الملف الشخصي">
                     <div id="profileDropdown" class="glass-panel profile-dropdown">
                         <div class="dropdown-item" onclick="confirmLogout()">
                             <span class="material-icons-round">logout</span> <span data-i18n="btn_logout">تسجيل خروج</span>
@@ -130,9 +139,9 @@
                     </div>
                 </div>
             {% else %}
-                <a href="/login" class="btn-glass btn-login">
+                <button class="btn-glass" onclick="document.getElementById('loginModal').style.display='flex'" style="width: auto; padding: 8px 15px; font-size: 0.9rem;">
                     <span class="material-icons-round" style="font-size:1.2rem;">login</span> <span data-i18n="btn_login">دخول</span>
-                </a>
+                </button>
             {% endif %}
         </div>
     </header>
@@ -149,52 +158,20 @@
         </section>
 
         <section class="stats-grid">
-            <div class="stat-card glass-panel">
-                <span class="material-icons-round stat-icon" style="color: #32d74b;">groups</span>
-                <div class="stat-num">+2,500</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_clients">عميل سعيد</div>
-            </div>
-            <div class="stat-card glass-panel">
-                <span class="material-icons-round stat-icon" style="color: #c300ff;">workspace_premium</span>
-                <div class="stat-num">+5,000</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_designs">تصميم منجز</div>
-            </div>
-            <div class="stat-card glass-panel">
-                <span class="material-icons-round stat-icon" style="color: #ff9f0a;">star_rate</span>
-                <div class="stat-num">4.9/5</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_rating">تقييم العملاء</div>
-            </div>
-            <div class="stat-card glass-panel">
-                <span class="material-icons-round stat-icon" style="color: #00b8d4;">bolt</span>
-                <div class="stat-num">24h</div>
-                <div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_delivery">متوسط التسليم</div>
-            </div>
+            <div class="stat-card glass-panel"><span class="material-icons-round stat-icon" style="color: #32d74b;">groups</span><div class="stat-num">+2,500</div><div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_clients">عميل سعيد</div></div>
+            <div class="stat-card glass-panel"><span class="material-icons-round stat-icon" style="color: #c300ff;">workspace_premium</span><div class="stat-num">+5,000</div><div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_designs">تصميم منجز</div></div>
+            <div class="stat-card glass-panel"><span class="material-icons-round stat-icon" style="color: #ff9f0a;">star_rate</span><div class="stat-num">4.9/5</div><div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_rating">تقييم العملاء</div></div>
+            <div class="stat-card glass-panel"><span class="material-icons-round stat-icon" style="color: #00b8d4;">bolt</span><div class="stat-num">24h</div><div style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="stat_delivery">متوسط التسليم</div></div>
         </section>
 
         <section>
             <h2 class="section-title" data-i18n="feat_title">لماذا نحن الأفضل؟</h2>
             <p style="text-align: center; color: #a1a1a6; margin-bottom: 25px;" data-i18n="feat_subtitle">نقدم لك أفضل الخدمات والمميزات</p>
             <div class="features-grid">
-                <div class="feature-card glass-panel">
-                    <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">color_lens</span>
-                    <h3 style="margin-bottom: 5px;" data-i18n="feat1_title">تصاميم احترافية</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat1_desc">نستخدم أحدث الأدوات والتقنيات لإنشاء تصاميم فريدة وجذابة.</p>
-                </div>
-                <div class="feature-card glass-panel">
-                    <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">speed</span>
-                    <h3 style="margin-bottom: 5px;" data-i18n="feat2_title">تسليم سريع</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat2_desc">نلتزم بالمواعيد ونسلم العمل في أسرع وقت ممكن.</p>
-                </div>
-                <div class="feature-card glass-panel">
-                    <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">verified</span>
-                    <h3 style="margin-bottom: 5px;" data-i18n="feat3_title">جودة مضمونة</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat3_desc">نضمن لك أعلى مستويات الجودة في كل تصميم.</p>
-                </div>
-                <div class="feature-card glass-panel">
-                    <span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">support_agent</span>
-                    <h3 style="margin-bottom: 5px;" data-i18n="feat4_title">دعم مستمر</h3>
-                    <p style="color: #a1a1a6; font-size: 0.85rem; line-height: 1.5;" data-i18n="feat4_desc">فريقنا متواجد دائماً للإجابة على استفساراتك.</p>
-                </div>
+                <div class="feature-card glass-panel"><span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">color_lens</span><h3 style="margin-bottom: 5px;" data-i18n="feat1_title">تصاميم احترافية</h3><p style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="feat1_desc">نستخدم أحدث الأدوات والتقنيات لإنشاء تصاميم فريدة وجذابة.</p></div>
+                <div class="feature-card glass-panel"><span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">speed</span><h3 style="margin-bottom: 5px;" data-i18n="feat2_title">تسليم سريع</h3><p style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="feat2_desc">نلتزم بالمواعيد ونسلم العمل في أسرع وقت ممكن.</p></div>
+                <div class="feature-card glass-panel"><span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">verified</span><h3 style="margin-bottom: 5px;" data-i18n="feat3_title">جودة مضمونة</h3><p style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="feat3_desc">نضمن لك أعلى مستويات الجودة في كل تصميم.</p></div>
+                <div class="feature-card glass-panel"><span class="material-icons-round" style="font-size: 2.2rem; margin-bottom: 10px; color: #c300ff;">support_agent</span><h3 style="margin-bottom: 5px;" data-i18n="feat4_title">دعم مستمر</h3><p style="color: #a1a1a6; font-size: 0.85rem;" data-i18n="feat4_desc">فريقنا متواجد دائماً للإجابة على استفساراتك.</p></div>
             </div>
         </section>
     </div>
@@ -212,7 +189,6 @@
 
     <div id="packages-section" class="page-section">
         <div style="max-width: 1200px; margin: 20px auto 0; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 50;">
-            
             <button class="btn-glass" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05);" onclick="switchTab('home-section', document.querySelectorAll('.nav-btn')[0])">
                 <span class="material-icons-round" style="font-size: 1.2rem; transform: scaleX(var(--arrow-dir, 1));">arrow_forward</span> <span data-i18n="btn_back">رجوع للرئيسية</span>
             </button>
@@ -221,7 +197,6 @@
                 <button class="btn-glass" id="selectedCatBtn" onclick="document.getElementById('catMenu').classList.toggle('show')" style="width: max-content; padding: 8px 15px; font-size: 0.9rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
                     <span id="catBtnText" data-i18n="opt_discord">تصاميم ديسكورد</span> <span class="material-icons-round" style="font-size: 1.2rem; margin-inline-start: 5px;">expand_more</span>
                 </button>
-                
                 <div id="catMenu" class="glass-panel profile-dropdown" style="top: 45px; left: 0; right: auto; width: max-content; padding: 10px;">
                     <div class="dropdown-item" onclick="chooseCat('opt_discord')"><span data-i18n="opt_discord">تصاميم ديسكورد</span></div>
                     <div class="dropdown-item" onclick="chooseCat('opt_stream')"><span data-i18n="opt_stream">تصاميم استريمنج</span></div>
@@ -239,93 +214,63 @@
         
         <div id="unavailableMsg" class="glass-panel" style="display: none; text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto 30px;">
             <span class="material-icons-round" style="font-size: 3.5rem; color: #ff9f0a; margin-bottom: 15px; display: block;">construction</span>
-            <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.4rem;">
-                <span data-i18n="msg_unavailable_part1">عذراً، قسم</span>
-                <span id="unavailCatName" style="color: #ff9f0a; margin: 0 5px;"></span>
-            </h3>
+            <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.4rem;"><span data-i18n="msg_unavailable_part1">عذراً، قسم</span> <span id="unavailCatName" style="color: #ff9f0a; margin: 0 5px;"></span></h3>
             <p style="color: #a1a1a6; font-size: 1rem;" data-i18n="msg_unavailable_part2">غير متاح حالياً وسيتم تحديد أسعاره قريباً.</p>
         </div>
 
         <div class="gallery">
-            <div class="design-card glass-panel" data-category="servers">
+            <div class="design-card glass-panel">
                 <div>
-                    <img src="{{ url_for('static', filename='basic.png') }}" alt="Basic" class="pkg-img">
-                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Basic</h3>
-                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="basic_desc">فئة التصميم البسيطة</p>
-                    <ul class="pkg-features">
-                        <li data-i18n="f_logo_static">شعار أحرف أو رمزي (ثابت)</li>
-                        <li data-i18n="f_banner_1">1 بنر ديسكورد</li>
-                        <li data-i18n="f_line_1">1 خط فاصل</li>
-                        <li data-i18n="f_info_6">6 صور إنفو</li>
-                        <li data-i18n="f_bot_3">3 صور بوتات</li>
-                    </ul>
+                    <img src="{{ url_for('static', filename='basic.png') }}" class="pkg-img">
+                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem;">Basic</h3><p style="color: #a1a1a6; font-size: 0.9rem;" data-i18n="basic_desc">فئة التصميم البسيطة</p>
+                    <ul class="pkg-features"><li data-i18n="f_logo_static">شعار أحرف</li><li data-i18n="f_banner_1">1 بنر</li><li data-i18n="f_line_1">1 خط</li><li data-i18n="f_info_6">6 صور إنفو</li><li data-i18n="f_bot_3">3 بوتات</li></ul>
                 </div>
                 <div>
-                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_750">750 ج.م</span></h3>
-                    <button class="btn-glass" onclick="openCheckout('Basic', 750)">
-                        <span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span>
-                    </button>
+                    <h3 style="color: #fff; font-size: 1.6rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_750">750 ج.م</span></h3>
+                    <button class="btn-glass" onclick="openCheckout('Basic', 750)"><span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span></button>
                 </div>
             </div>
-
-            <div class="design-card glass-panel" data-category="servers">
+            <div class="design-card glass-panel">
                 <div>
-                    <img src="{{ url_for('static', filename='master.png') }}" alt="Master" class="pkg-img">
-                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Master</h3>
-                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="master_desc">فئة التصميم المتوسطة</p>
-                    <ul class="pkg-features">
-                        <li data-i18n="f_logo_anim">شعار أحرف أو رمزي (متحرك)</li>
-                        <li data-i18n="f_banner_1">1 بنر ديسكورد</li>
-                        <li data-i18n="f_line_1">1 خط فاصل</li>
-                        <li data-i18n="f_welcome_1">1 ترحيب ديسكورد</li>
-                        <li data-i18n="f_invite_1">1 بانر إنفايت (ثابت)</li>
-                        <li data-i18n="f_colors_1">1 صور علبة ألوان</li>
-                        <li data-i18n="f_rules_1">1 إنفو قوانين</li>
-                        <li data-i18n="f_info_unl">صور إنفو (لا نهائية)</li>
-                        <li data-i18n="f_bot_unl">صور بوتات (لا نهائية)</li>
-                    </ul>
+                    <img src="{{ url_for('static', filename='master.png') }}" class="pkg-img">
+                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem;">Master</h3><p style="color: #a1a1a6; font-size: 0.9rem;" data-i18n="master_desc">فئة التصميم المتوسطة</p>
+                    <ul class="pkg-features"><li data-i18n="f_logo_anim">شعار متحرك</li><li data-i18n="f_banner_1">1 بنر</li><li data-i18n="f_welcome_1">1 ترحيب</li><li data-i18n="f_invite_1">1 إنفايت</li><li data-i18n="f_info_unl">صور إنفو لا نهائية</li></ul>
                 </div>
                 <div>
-                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_1500">1500 ج.م</span></h3>
-                    <button class="btn-glass" onclick="openCheckout('Master', 1500)">
-                        <span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span>
-                    </button>
+                    <h3 style="color: #fff; font-size: 1.6rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_1500">1500 ج.م</span></h3>
+                    <button class="btn-glass" onclick="openCheckout('Master', 1500)"><span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span></button>
                 </div>
             </div>
-
-            <div class="design-card glass-panel" data-category="servers">
+            <div class="design-card glass-panel">
                 <div>
-                    <img src="{{ url_for('static', filename='premium.png') }}" alt="Premium" class="pkg-img">
-                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem; letter-spacing: 1px;">Premium</h3>
-                    <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 15px;" data-i18n="premium_desc">فئة التصميم الاحترافية</p>
-                    <ul class="pkg-features">
-                        <li data-i18n="f_logo_anim">شعار أحرف أو رمزي (متحرك)</li>
-                        <li data-i18n="f_banner_1">1 بانر ديسكورد</li>
-                        <li data-i18n="f_line_1">1 خط فاصل</li>
-                        <li data-i18n="f_welcome_1">1 ترحيب ديسكورد</li>
-                        <li data-i18n="f_invite_1">1 بانر إنفايت (ثابت)</li>
-                        <li data-i18n="f_colors_1">1 صور علبة ألوان</li>
-                        <li data-i18n="f_rules_1">1 إنفو قوانين</li>
-                        <li data-i18n="f_profiles_3">3 بنرات بروفايلات</li>
-                        <li data-i18n="f_intro_1">1 صورة افتتاحية</li>
-                        <li data-i18n="f_all_unl">صور إنفو وألعاب وبوتات (لا نهائية)</li>
-                    </ul>
+                    <img src="{{ url_for('static', filename='premium.png') }}" class="pkg-img">
+                    <h3 style="margin-bottom: 5px; color: #fff; font-size: 1.8rem;">Premium</h3><p style="color: #a1a1a6; font-size: 0.9rem;" data-i18n="premium_desc">فئة التصميم الاحترافية</p>
+                    <ul class="pkg-features"><li data-i18n="f_logo_anim">شعار متحرك</li><li data-i18n="f_profiles_3">3 بنرات بروفايلات</li><li data-i18n="f_intro_1">1 صورة افتتاحية</li><li data-i18n="f_all_unl">صور إنفو وألعاب لا نهائية</li></ul>
                 </div>
                 <div>
-                    <h3 style="color: #fff; font-size: 1.6rem; margin-bottom: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_2250">2250 ج.م</span></h3>
-                    <button class="btn-glass" onclick="openCheckout('Premium', 2250)">
-                        <span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span>
-                    </button>
+                    <h3 style="color: #fff; font-size: 1.6rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;"><span data-i18n="price_2250">2250 ج.م</span></h3>
+                    <button class="btn-glass" onclick="openCheckout('Premium', 2250)"><span class="material-icons-round">shopping_cart</span> <span data-i18n="btn_buy">شراء الآن</span></button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="modal" id="loginModal">
+        <div class="modal-content glass-panel">
+            <h2 style="margin-bottom: 25px;" data-i18n="modal_login_title">اختر طريقة الدخول</h2>
+            <button class="btn-glass" style="background: rgba(88, 101, 242, 0.2); border-color: #5865F2; margin-bottom: 15px; color: #fff;" onclick="window.location.href='/login/discord'">
+                <span style="font-size: 1.2rem;">🎮</span> <span data-i18n="btn_login_discord">دخول بواسطة ديسكورد</span>
+            </button>
+            <button class="btn-glass" style="background: rgba(255, 255, 255, 0.1); border-color: #fff; color: #fff;" onclick="window.location.href='/login/google'">
+                <span style="font-size: 1.2rem;">🌐</span> <span data-i18n="btn_login_google">دخول بواسطة جوجل</span>
+            </button>
+            <button class="btn-glass btn-outline" style="margin-top: 20px;" onclick="closeModals()" data-i18n="btn_cancel">إلغاء</button>
+        </div>
+    </div>
+
     <div class="modal" id="logoutConfirmModal">
         <div class="modal-content glass-panel">
-            <h2 style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <span class="material-icons-round" style="color: #ff3b30;">logout</span> <span data-i18n="modal_logout_title">هل أنت متأكد؟</span>
-            </h2>
+            <h2 style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><span class="material-icons-round" style="color: #ff3b30;">logout</span> <span data-i18n="modal_logout_title">هل أنت متأكد؟</span></h2>
             <p style="color: #a1a1a6; margin-bottom: 25px;" data-i18n="modal_logout_desc">هل تريد فعلاً تسجيل الخروج من حسابك؟</p>
             <div style="display: flex; gap: 10px;">
                 <button class="btn-glass" style="background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.3); color: #ff3b30;" onclick="window.location.href='/logout'" data-i18n="btn_yes_logout">نعم، خروج</button>
@@ -339,31 +284,51 @@
             {% if user %}
                 <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round">account_balance_wallet</span> <span data-i18n="modal_pay_title">الدفع</span></h2>
                 
-                <select id="paymentMethodInput" class="input-glass" onchange="checkPaymentMethod()" style="margin-bottom: 20px;">
-                    <option value="" disabled selected data-i18n="opt_pay_select">اختر طريقة الدفع</option>
-                    <option value="vodafone">Vodafone Cash</option>
-                    <option value="paypal" disabled data-i18n="pay_paypal">PayPal (غير متاح)</option>
-                    <option value="stc" disabled data-i18n="pay_stc">STC Pay (غير متاح)</option>
-                    <option value="urpay" disabled data-i18n="pay_urpay">UrPay (غير متاح)</option>
-                    <option value="rajhi" disabled data-i18n="pay_rajhi">الراجحي (غير متاح)</option>
-                    <option value="binance" disabled data-i18n="pay_binance">Binance (غير متاح)</option>
-                    <option value="instapay" disabled data-i18n="pay_instapay">Instapay (غير متاح)</option>
-                </select>
+                <div class="custom-pay-dropdown">
+                    <div class="pay-display" id="payDisplayBtn" onclick="document.getElementById('payOptions').classList.toggle('show')">
+                        <span id="selectedPayText" data-i18n="opt_pay_select">اختر طريقة الدفع</span>
+                        <span class="material-icons-round">expand_more</span>
+                    </div>
+                    <div class="pay-list" id="payOptions">
+                        <div class="pay-item" onclick="selectPayment('vodafone', 'Vodafone Cash')">
+                            <span>Vodafone Cash</span> <span class="material-icons-round" style="color:#32d74b;">check_circle</span>
+                        </div>
+                        <div class="pay-item disabled">
+                            <span>PayPal</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
+                        </div>
+                        <div class="pay-item disabled">
+                            <span>STC Pay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
+                        </div>
+                        <div class="pay-item disabled">
+                            <span>UrPay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
+                        </div>
+                        <div class="pay-item disabled">
+                            <span data-i18n="pay_rajhi">الراجحي</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
+                        </div>
+                        <div class="pay-item disabled">
+                            <span>Binance</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
+                        </div>
+                        <div class="pay-item disabled">
+                            <span>Instapay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div id="vodafoneDetails" style="display: none; width: 100%;">
                     <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
-                    <input type="text" id="discordIdInput" class="input-glass" value="{{ user.id }}">
+                    <input type="text" id="discordIdInput" class="input-glass" value="{% if user.provider == 'discord' %}{{ user.id }}{% endif %}">
                     <input type="tel" id="vCashNum" class="input-glass">
                 </div>
 
+                <input type="hidden" id="paymentMethodInput">
                 <input type="hidden" id="pkgName">
                 <input type="hidden" id="pkgPrice">
                 <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> <span id="btnConfirmText" data-i18n="btn_confirm_pay">تأكيد الدفع</span></button>
                 <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_cancel">إلغاء</button>
             {% else %}
                 <h2 style="margin-bottom: 15px;" data-i18n="modal_alert">تنبيه</h2>
-                <p style="color: #a1a1a6; margin-bottom: 20px;" data-i18n="modal_login_req">يجب تسجيل الدخول بواسطة ديسكورد لإتمام الشراء.</p>
-                <a href="/login" class="btn-glass" style="text-decoration:none;" data-i18n="btn_login_now">تسجيل الدخول الآن</a>
+                <p style="color: #a1a1a6; margin-bottom: 20px;" data-i18n="modal_login_req">يجب تسجيل الدخول لإتمام الشراء.</p>
+                <button class="btn-glass" onclick="closeModals(); document.getElementById('loginModal').style.display='flex'" data-i18n="btn_login_now">تسجيل الدخول الآن</button>
                 <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_close">إغلاق</button>
             {% endif %}
         </div>
@@ -377,7 +342,7 @@
             </div>
             <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
                 <strong style="color: #fff; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">notifications_active</span> <span data-i18n="modal_last_step">خطوة أخيرة!</span></strong>
-                <p style="margin-top:8px; color:#d1d1d6;" data-i18n="modal_send_ss">أرسل سكرين شوت للإيصال إلى <span style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace; border: 1px solid rgba(255,255,255,0.2);">946m</span> عبر ديسكورد.</p>
+                <p style="margin-top:8px; color:#d1d1d6;" data-i18n="modal_send_ss">أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.</p>
             </div>
             <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()" data-i18n="btn_back_gal">العودة للمعرض</button>
         </div>
@@ -407,12 +372,14 @@
                 port_title: "أحدث أعمالنا", port_subtitle: "تصفح تصاميمنا السابقة",
                 pkg_title: "باقات السيرفرات", basic_desc: "فئة التصميم البسيطة", master_desc: "فئة التصميم المتوسطة", premium_desc: "فئة التصميم الاحترافية",
                 f_logo_static: "شعار أحرف أو رمزي (ثابت)", f_banner_1: "1 بنر ديسكورد", f_line_1: "1 خط فاصل", f_info_6: "6 صور إنفو", f_bot_3: "3 صور بوتات",
-                f_logo_anim: "شعار أحرف أو رمزي (متحرك)", f_welcome_1: "1 ترحيب ديسكورد", f_invite_1: "1 بانر إنفايت (ثابت)", f_colors_1: "1 صور علبة ألوان", f_rules_1: "1 إنفو قوانين", f_info_unl: "صور إنفو (لا نهائية)", f_bot_unl: "صور بوتات (لا نهائية)",
+                f_logo_anim: "شعار أحرف أو رمزي (متحرك)", f_welcome_1: "1 ترحيب ديسكورد", f_invite_1: "1 بانر إنفايت (ثابت)", f_info_unl: "صور إنفو (لا نهائية)",
                 f_profiles_3: "3 بنرات بروفايلات", f_intro_1: "1 صورة افتتاحية", f_all_unl: "صور إنفو وألعاب وبوتات (لا نهائية)",
                 price_750: "750 ج.م", price_1500: "1500 ج.م", price_2250: "2250 ج.م", btn_buy: "شراء الآن",
+                modal_login_title: "اختر طريقة الدخول", btn_login_discord: "دخول بواسطة ديسكورد", btn_login_google: "دخول بواسطة جوجل",
                 modal_logout_title: "هل أنت متأكد؟", modal_logout_desc: "هل تريد فعلاً تسجيل الخروج من حسابك؟", btn_yes_logout: "نعم، خروج", btn_no_cancel: "لا، تراجع",
+                logged_via_discord: "مُسجل عبر ديسكورد", logged_via_google: "مُسجل عبر جوجل",
                 modal_pay_title: "الدفع", modal_pay_vca: "التحويل على فودافون كاش:", btn_confirm_pay: "تأكيد الدفع", btn_cancel: "إلغاء",
-                modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول بواسطة ديسكورد لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
+                modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
                 modal_success: "تم تسجيل طلبك!", lbl_pkg: "الباقة:", lbl_num: "الرقم:", lbl_rec: "رقم الإيصال:",
                 modal_last_step: "خطوة أخيرة!", modal_send_ss: "أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.", btn_back_gal: "العودة للمعرض",
                 place_disc: "أيدي الديسكورد (للتواصل)", place_phone: "رقم الموبايل المحول منه",
@@ -420,10 +387,10 @@
                 opt_fivem: "تصاميم فايف ام", opt_youtube: "تصاميم يوتيوب", opt_social: "تصاميم سوشيال ميديا",
                 opt_sala: "تصميم sala", opt_web: "تصميم مواقع", opt_logo: "تصميم شعارات",
                 msg_unavailable_part1: "عذراً، قسم ", msg_unavailable_part2: " غير متاح حالياً وسيتم تحديد أسعاره قريباً.",
-                opt_pay_select: "اختر طريقة الدفع", pay_paypal: "PayPal (غير متاح)", pay_stc: "STC Pay (غير متاح)", pay_urpay: "UrPay (غير متاح)", pay_rajhi: "الراجحي (غير متاح)", pay_binance: "Binance (غير متاح)", pay_instapay: "Instapay (غير متاح)",
+                opt_pay_select: "اختر طريقة الدفع", pay_rajhi: "الراجحي", status_unavail: "غير متاح",
                 msg_loading: "جاري التحميل...", msg_no_port: "لم يتم إضافة أعمال بعد.", msg_no_orders: "لا توجد طلبات سابقة.",
                 status_0: "قيد الانتظار", status_1: "جاري العمل", status_2: "مكتمل", lbl_order_id: "رقم الطلب:",
-                err_data: "يرجى إكمال البيانات!", err_pay: "يرجى اختيار طريقة الدفع أولاً!", err_conn: "حدث خطأ في الاتصال."
+                err_data: "يرجى إكمال البيانات!", err_pay: "يرجى اختيار طريقة الدفع أولاً!", err_type: "يرجى اختيار نوع التصميم!", err_conn: "حدث خطأ في الاتصال."
             },
             en: {
                 nav_home: "Home", nav_portfolio: "Portfolio", nav_packages: "Packages", nav_orders: "My Orders",
@@ -438,13 +405,15 @@
                 feat4_title: "24/7 Support", feat4_desc: "Our team is always available to answer your questions.",
                 port_title: "Our Latest Work", port_subtitle: "Browse our previous designs",
                 pkg_title: "Server Packages", basic_desc: "Basic Design Tier", master_desc: "Medium Design Tier", premium_desc: "Pro Design Tier",
-                f_logo_static: "Static Letter/Symbol Logo", f_banner_1: "1 Discord Banner", f_line_1: "1 Divider", f_info_6: "6 Info Images", f_bot_3: "3 Bot Images",
-                f_logo_anim: "Animated Letter/Symbol Logo", f_welcome_1: "1 Discord Welcome", f_invite_1: "1 Static Invite Banner", f_colors_1: "1 Color Palette", f_rules_1: "1 Rules Info", f_info_unl: "Unlimited Info Images", f_bot_unl: "Unlimited Bot Images",
-                f_profiles_3: "3 Profile Banners", f_intro_1: "1 Intro Image", f_all_unl: "Unlimited Info, Games & Bot Images",
+                f_logo_static: "Static Logo", f_banner_1: "1 Banner", f_line_1: "1 Divider", f_info_6: "6 Info Images", f_bot_3: "3 Bot Images",
+                f_logo_anim: "Animated Logo", f_welcome_1: "1 Welcome", f_invite_1: "1 Invite Banner", f_info_unl: "Unlimited Info Images",
+                f_profiles_3: "3 Profile Banners", f_intro_1: "1 Intro Image", f_all_unl: "Unlimited Images & Bots",
                 price_750: "750 EGP", price_1500: "1500 EGP", price_2250: "2250 EGP", btn_buy: "Buy Now",
+                modal_login_title: "Select Login Method", btn_login_discord: "Login with Discord", btn_login_google: "Login with Google",
                 modal_logout_title: "Are you sure?", modal_logout_desc: "Do you really want to log out of your account?", btn_yes_logout: "Yes, Logout", btn_no_cancel: "No, Cancel",
+                logged_via_discord: "Logged via Discord", logged_via_google: "Logged via Google",
                 modal_pay_title: "Checkout", modal_pay_vca: "Transfer to Vodafone Cash:", btn_confirm_pay: "Confirm Order", btn_cancel: "Cancel",
-                modal_alert: "Alert", modal_login_req: "You must login via Discord to purchase.", btn_login_now: "Login Now", btn_close: "Close",
+                modal_alert: "Alert", modal_login_req: "You must login to purchase.", btn_login_now: "Login Now", btn_close: "Close",
                 modal_success: "Order Submitted!", lbl_pkg: "Package:", lbl_num: "Number:", lbl_rec: "Receipt ID:",
                 modal_last_step: "One last step!", modal_send_ss: "Send a screenshot of the receipt to 946m via Discord.", btn_back_gal: "Back to Gallery",
                 place_disc: "Discord ID (Contact)", place_phone: "Transfer Phone Number",
@@ -452,20 +421,19 @@
                 opt_fivem: "FiveM Designs", opt_youtube: "YouTube Designs", opt_social: "Social Media Designs",
                 opt_sala: "Sala Designs", opt_web: "Website Designs", opt_logo: "Logo Designs",
                 msg_unavailable_part1: "Sorry, ", msg_unavailable_part2: " is currently unavailable. Prices will be set soon.",
-                opt_pay_select: "Select Payment Method", pay_paypal: "PayPal (Unavailable)", pay_stc: "STC Pay (Unavailable)", pay_urpay: "UrPay (Unavailable)", pay_rajhi: "Al Rajhi (Unavailable)", pay_binance: "Binance (Unavailable)", pay_instapay: "Instapay (Unavailable)",
+                opt_pay_select: "Select Payment Method", pay_rajhi: "Al Rajhi", status_unavail: "Unavailable",
                 msg_loading: "Loading...", msg_no_port: "No portfolio items added yet.", msg_no_orders: "No previous orders.",
                 status_0: "Pending", status_1: "In Progress", status_2: "Completed", lbl_order_id: "Order ID:",
-                err_data: "Please fill all fields!", err_pay: "Please select a payment method first!", err_conn: "Connection error."
+                err_data: "Please fill all fields!", err_pay: "Please select a payment method!", err_type: "Please select a design category!", err_conn: "Connection error."
             }
         };
 
         let currentLang = 'ar';
-        let activeDesignTypeI18n = 'opt_discord'; // ديسكورد هو الافتراضي
+        let activeDesignTypeI18n = 'opt_discord';
 
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             const dict = translations[currentLang];
-            
             document.documentElement.lang = currentLang;
             document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
             document.documentElement.style.setProperty('--arrow-dir', currentLang === 'ar' ? '1' : '-1');
@@ -475,12 +443,13 @@
                 if(dict[key]) el.innerHTML = dict[key]; 
             });
 
-            document.getElementById('discordIdInput').placeholder = dict['place_disc'];
-            document.getElementById('vCashNum').placeholder = dict['place_phone'];
+            const discInput = document.getElementById('discordIdInput');
+            if(discInput) discInput.placeholder = dict['place_disc'];
             
-            // تحديث رسالة القسم المغلق لو موجودة
+            const cashInput = document.getElementById('vCashNum');
+            if(cashInput) cashInput.placeholder = dict['place_phone'];
+            
             chooseCat(activeDesignTypeI18n);
-
             loadPortfolio();
             if(document.getElementById('ordersModal').style.display === 'flex') openOrders();
         }
@@ -501,9 +470,12 @@
                 var pMenu = document.getElementById("profileDropdown");
                 if (pMenu && pMenu.classList.contains('show')) pMenu.classList.remove('show');
             }
-            if (!event.target.closest('#selectedCatBtn')) {
+            if (!event.target.closest('#selectedCatBtn') && !event.target.closest('.custom-pay-dropdown')) {
                 var cMenu = document.getElementById("catMenu");
                 if (cMenu && cMenu.classList.contains('show')) cMenu.classList.remove('show');
+                
+                var payMenu = document.getElementById("payOptions");
+                if (payMenu && payMenu.classList.contains('show')) payMenu.classList.remove('show');
             }
         }
 
@@ -522,7 +494,6 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // ================= اختيار الكاتيجوري وإخفاء الباقات =================
         function chooseCat(i18nKey) {
             activeDesignTypeI18n = i18nKey;
             const btnText = document.getElementById('catBtnText');
@@ -534,7 +505,6 @@
             const unavailMsg = document.getElementById('unavailableMsg');
             const unavailCatName = document.getElementById('unavailCatName');
 
-            // لو اختار ديسكورد نعرض الباقات، لو حاجة تانية نخفيها ونعرض الرسالة
             if(i18nKey === 'opt_discord') {
                 gallery.style.display = 'grid';
                 unavailMsg.style.display = 'none';
@@ -566,14 +536,15 @@
                 `).join('');
             } catch(e) { container.innerHTML = `<p style="text-align:center; color:#ff3b30;">${dict['err_conn']}</p>`; }
         }
-        
         window.onload = loadPortfolio;
 
-        // ================= دالة الدفع الجديدة =================
-        function checkPaymentMethod() {
-            const method = document.getElementById('paymentMethodInput').value;
-            // إظهار خانة الرقم لو اختار فودافون بس
-            if(method === 'vodafone') {
+        function selectPayment(value, text) {
+            document.getElementById('paymentMethodInput').value = value;
+            document.getElementById('selectedPayText').innerText = text;
+            document.getElementById('selectedPayText').removeAttribute('data-i18n'); 
+            document.getElementById('payOptions').classList.remove('show');
+            
+            if(value === 'vodafone') {
                 document.getElementById('vodafoneDetails').style.display = 'block';
             } else {
                 document.getElementById('vodafoneDetails').style.display = 'none';
@@ -581,32 +552,29 @@
         }
 
         function openCheckout(n, p) {
+            if (!activeDesignTypeI18n) return alert(translations[currentLang]['err_type']);
+
             document.getElementById('checkoutModal').style.display = 'flex';
             document.getElementById('checkoutForm').style.display = 'block';
             document.getElementById('receiptBox').style.display = 'none';
             
-            // تصفير القائمة والرقم كل ما يفتح النافذة
             document.getElementById('paymentMethodInput').value = "";
+            document.getElementById('selectedPayText').innerText = translations[currentLang]['opt_pay_select'];
+            document.getElementById('selectedPayText').setAttribute('data-i18n', 'opt_pay_select');
             document.getElementById('vodafoneDetails').style.display = 'none';
             document.getElementById('vCashNum').value = "";
 
             const catNameAr = translations['ar'][activeDesignTypeI18n];
             document.getElementById('pkgName').value = n + " (" + catNameAr + ")";
             document.getElementById('pkgPrice').value = p;
-            
-            document.getElementById('discordIdInput').placeholder = translations[currentLang]['place_disc'];
-            document.getElementById('vCashNum').placeholder = translations[currentLang]['place_phone'];
         }
 
-        function closeModals() {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-        }
+        function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
 
         async function submitOrder() {
             const dict = translations[currentLang];
             const payMethod = document.getElementById('paymentMethodInput').value;
-            
-            if(!payMethod) return alert(dict['err_pay']); // لازم يختار طريقة الدفع
+            if(!payMethod) return alert(dict['err_pay']);
 
             const phone = document.getElementById('vCashNum').value;
             const pkg = document.getElementById('pkgName').value;
@@ -634,15 +602,9 @@
                     document.getElementById('recPkg').innerText = pkg; 
                     document.getElementById('recPhone').innerText = phone;
                     document.getElementById('recId').innerText = "#" + data.order_id;
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                alert(dict['err_conn']);
-            } finally {
-                btnText.innerText = originalText;
-                document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'auto';
-            }
+                } else { alert(data.message); }
+            } catch (err) { alert(dict['err_conn']); } 
+            finally { btnText.innerText = originalText; document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'auto'; }
         }
 
         async function openOrders() {
@@ -650,16 +612,10 @@
             document.getElementById('ordersModal').style.display = 'flex';
             const list = document.getElementById('ordersList');
             list.innerHTML = `<p style="color:#a1a1a6; text-align:center;"><span class="material-icons-round" style="animation: rotate 1s linear infinite; vertical-align:middle;">sync</span> ${dict['msg_loading']}</p>`;
-            
             try {
                 const res = await fetch('/api/my_orders');
                 const orders = await res.json();
-                
-                if(orders.length === 0) {
-                    list.innerHTML = `<p style="color:#a1a1a6; padding: 20px 0; text-align:center;">${dict['msg_no_orders']}</p>`;
-                    return;
-                }
-
+                if(orders.length === 0) return list.innerHTML = `<p style="color:#a1a1a6; padding: 20px 0; text-align:center;">${dict['msg_no_orders']}</p>`;
                 list.innerHTML = orders.map(o => {
                     let sText = o.status === 0 ? dict['status_0'] : o.status === 1 ? dict['status_1'] : dict['status_2'];
                     return `
@@ -672,9 +628,7 @@
                         <div class="status-text">${sText}</div>
                     </div>`;
                 }).join('');
-            } catch (err) {
-                list.innerHTML = `<p style="color:#ff3b30; text-align:center;">${dict['err_conn']}</p>`;
-            }
+            } catch (err) { list.innerHTML = `<p style="color:#ff3b30; text-align:center;">${dict['err_conn']}</p>`; }
         }
     </script>
 </body>
