@@ -44,14 +44,13 @@
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal-content { width: 100%; max-width: 450px; padding: 25px 20px; text-align: center; animation: popUp 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
-        /* إخفاء شريط التمرير في النافذة عشان الشياكة */
         .modal-content::-webkit-scrollbar { width: 0px; }
         @keyframes popUp { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;}
         .input-glass:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1);}
 
-        /* القائمة المنسدلة المخصصة لطرق الدفع */
+        /* القائمة المنسدلة المخصصة لطرق الدفع والتواصل */
         .custom-pay-dropdown { position: relative; width: 100%; margin-bottom: 15px; text-align: start; }
         .pay-display { padding: 14px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);}
         .pay-display:hover { background: rgba(255,255,255,0.05); }
@@ -288,8 +287,8 @@
             {% if user %}
                 <h2 style="display:flex; justify-content:center; align-items:center; gap:8px; margin-bottom: 15px;"><span class="material-icons-round">account_balance_wallet</span> <span data-i18n="modal_pay_title">الدفع</span></h2>
                 
-                <div class="custom-pay-dropdown">
-                    <div class="pay-display" id="payDisplayBtn" onclick="document.getElementById('payOptions').classList.toggle('show')">
+                <div class="custom-pay-dropdown" style="z-index: 100;">
+                    <div class="pay-display" onclick="document.getElementById('payOptions').classList.toggle('show'); document.getElementById('contactOptions').classList.remove('show');">
                         <span id="selectedPayText" data-i18n="opt_pay_select">اختر طريقة الدفع</span>
                         <span class="material-icons-round">expand_more</span>
                     </div>
@@ -306,13 +305,35 @@
                     </div>
                 </div>
 
+                <div class="custom-pay-dropdown" style="z-index: 90;">
+                    <div class="pay-display" onclick="document.getElementById('contactOptions').classList.toggle('show'); document.getElementById('payOptions').classList.remove('show');">
+                        <span id="selectedContactText" data-i18n="opt_contact_discord">التواصل عبر ديسكورد</span>
+                        <span class="material-icons-round">expand_more</span>
+                    </div>
+                    <div class="pay-list" id="contactOptions">
+                        <div class="pay-item" onclick="selectContact('discord', 'opt_contact_discord', 'place_disc')">
+                            <span data-i18n="opt_contact_discord">التواصل عبر ديسكورد</span>
+                            <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" style="width:16px; filter: brightness(0) invert(1);">
+                        </div>
+                        <div class="pay-item" onclick="selectContact('instagram', 'opt_contact_insta', 'place_insta')">
+                            <span data-i18n="opt_contact_insta">التواصل عبر انستجرام</span>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" style="width:16px;">
+                        </div>
+                        <div class="pay-item" onclick="selectContact('gmail', 'opt_contact_gmail', 'place_email')">
+                            <span data-i18n="opt_contact_gmail">التواصل عبر جيميل</span>
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/C/C0/Gmail_icon_%282020%29.svg" style="width:16px;">
+                        </div>
+                    </div>
+                </div>
+
                 <div id="vodafoneDetails" style="display: none; width: 100%;">
                     <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
-                    <input type="text" id="discordIdInput" class="input-glass" value="{% if user.provider == 'discord' %}{{ user.id }}{% endif %}">
+                    <input type="text" id="discordIdInput" class="input-glass" data-i18n-place="place_disc" placeholder="أيدي الديسكورد (للتواصل)" value="{% if user.provider == 'discord' %}{{ user.id }}{% elif user.provider == 'google' %}{{ user.username }}{% endif %}">
                     <input type="tel" id="vCashNum" class="input-glass">
                 </div>
 
                 <input type="hidden" id="paymentMethodInput">
+                <input type="hidden" id="contactMethodInput" value="discord">
                 <input type="hidden" id="pkgName">
                 <input type="hidden" id="pkgPrice">
                 <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> <span id="btnConfirmText" data-i18n="btn_confirm_pay">تأكيد الدفع</span></button>
@@ -335,7 +356,8 @@
                         </div>
                     </div>
                 </div>
-                {% else %}
+
+            {% else %}
                 <h2 style="margin-bottom: 15px;" data-i18n="modal_alert">تنبيه</h2>
                 <p style="color: #a1a1a6; margin-bottom: 20px;" data-i18n="modal_login_req">يجب تسجيل الدخول لإتمام الشراء.</p>
                 <button class="btn-glass" onclick="closeModals(); document.getElementById('loginModal').style.display='flex'" data-i18n="btn_login_now">تسجيل الدخول الآن</button>
@@ -350,9 +372,14 @@
                 <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;" data-i18n="lbl_num">الرقم:</strong> <span id="recPhone"></span></p>
                 <p><strong style="color:#a1a1a6;" data-i18n="lbl_rec">رقم الإيصال:</strong> <span id="recId" style="color: #fff; font-weight:bold; letter-spacing:1px;"></span></p>
             </div>
+            
             <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
                 <strong style="color: #fff; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">notifications_active</span> <span data-i18n="modal_last_step">خطوة أخيرة!</span></strong>
-                <p style="margin-top:8px; color:#d1d1d6;" data-i18n="modal_send_ss">أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.</p>
+                <p style="margin-top:8px; color:#d1d1d6; line-height: 1.6;">
+                    <span data-i18n="modal_send_ss_base">أرسل سكرين شوت للإيصال إلى</span><br>
+                    <span id="finalStepTarget" style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace; border: 1px solid rgba(255,255,255,0.2); margin: 0 4px; font-size: 1rem; color: #fff;">946m</span><br>
+                    <span id="finalStepMethod" data-i18n="via_discord">عبر ديسكورد.</span>
+                </p>
             </div>
             <button class="btn-glass btn-outline" style="margin-top:20px;" onclick="closeModals()" data-i18n="btn_back_gal">العودة للمعرض</button>
         </div>
@@ -392,8 +419,10 @@
                 contact_designer: "للتواصل مع المصمم:",
                 modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
                 modal_success: "تم تسجيل طلبك!", lbl_pkg: "الباقة:", lbl_num: "الرقم:", lbl_rec: "رقم الإيصال:",
-                modal_last_step: "خطوة أخيرة!", modal_send_ss: "أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.", btn_back_gal: "العودة للمعرض",
-                place_disc: "أيدي الديسكورد (للتواصل)", place_phone: "رقم الموبايل المحول منه",
+                modal_last_step: "خطوة أخيرة!", modal_send_ss_base: "أرسل سكرين شوت للإيصال إلى", 
+                via_discord: "عبر ديسكورد.", via_insta: "عبر انستجرام.", via_gmail: "عبر جيميل.", btn_back_gal: "العودة للمعرض",
+                place_disc: "أيدي الديسكورد (للتواصل)", place_insta: "يوزر الانستجرام (للتواصل)", place_email: "الإيميل (للتواصل)", place_phone: "رقم الموبايل المحول منه",
+                opt_contact_discord: "التواصل عبر ديسكورد", opt_contact_insta: "التواصل عبر انستجرام", opt_contact_gmail: "التواصل عبر جيميل",
                 opt_select: "اختر نوع التصميم", opt_discord: "تصاميم ديسكورد", opt_stream: "تصاميم استريمنج",
                 opt_fivem: "تصاميم فايف ام", opt_youtube: "تصاميم يوتيوب", opt_social: "تصاميم سوشيال ميديا",
                 opt_sala: "تصميم sala", opt_web: "تصميم مواقع", opt_logo: "تصميم شعارات",
@@ -427,8 +456,10 @@
                 contact_designer: "Contact Designer:",
                 modal_alert: "Alert", modal_login_req: "You must login to purchase.", btn_login_now: "Login Now", btn_close: "Close",
                 modal_success: "Order Submitted!", lbl_pkg: "Package:", lbl_num: "Number:", lbl_rec: "Receipt ID:",
-                modal_last_step: "One last step!", modal_send_ss: "Send a screenshot of the receipt to 946m via Discord.", btn_back_gal: "Back to Gallery",
-                place_disc: "Discord ID (Contact)", place_phone: "Transfer Phone Number",
+                modal_last_step: "One last step!", modal_send_ss_base: "Send a screenshot of the receipt to", 
+                via_discord: "via Discord.", via_insta: "via Instagram.", via_gmail: "via Gmail.", btn_back_gal: "Back to Gallery",
+                place_disc: "Discord ID (Contact)", place_insta: "Instagram Username (Contact)", place_email: "Email Address (Contact)", place_phone: "Transfer Phone Number",
+                opt_contact_discord: "Contact via Discord", opt_contact_insta: "Contact via Instagram", opt_contact_gmail: "Contact via Gmail",
                 opt_select: "Select Category", opt_discord: "Discord Designs", opt_stream: "Streaming Designs",
                 opt_fivem: "FiveM Designs", opt_youtube: "YouTube Designs", opt_social: "Social Media Designs",
                 opt_sala: "Sala Designs", opt_web: "Website Designs", opt_logo: "Logo Designs",
@@ -455,8 +486,12 @@
                 if(dict[key]) el.innerHTML = dict[key]; 
             });
 
+            // ترجمة الـ Placeholders
             const discInput = document.getElementById('discordIdInput');
-            if(discInput) discInput.placeholder = dict['place_disc'];
+            if(discInput) {
+                const placeKey = discInput.getAttribute('data-i18n-place') || 'place_disc';
+                discInput.placeholder = dict[placeKey];
+            }
             
             const cashInput = document.getElementById('vCashNum');
             if(cashInput) cashInput.placeholder = dict['place_phone'];
@@ -488,6 +523,9 @@
                 
                 var payMenu = document.getElementById("payOptions");
                 if (payMenu && payMenu.classList.contains('show')) payMenu.classList.remove('show');
+
+                var contactMenu = document.getElementById("contactOptions");
+                if (contactMenu && contactMenu.classList.contains('show')) contactMenu.classList.remove('show');
             }
         }
 
@@ -563,6 +601,20 @@
             }
         }
 
+        function selectContact(method, textI18n, placeholderI18n) {
+            document.getElementById('contactMethodInput').value = method;
+            
+            const textSpan = document.getElementById('selectedContactText');
+            textSpan.setAttribute('data-i18n', textI18n);
+            textSpan.innerText = translations[currentLang][textI18n];
+            
+            const inputField = document.getElementById('discordIdInput');
+            inputField.placeholder = translations[currentLang][placeholderI18n];
+            inputField.setAttribute('data-i18n-place', placeholderI18n);
+            
+            document.getElementById('contactOptions').classList.remove('show');
+        }
+
         function openCheckout(n, p) {
             if (!activeDesignTypeI18n) return alert(translations[currentLang]['err_type']);
 
@@ -587,6 +639,7 @@
         async function submitOrder() {
             const dict = translations[currentLang];
             const payMethod = document.getElementById('paymentMethodInput').value;
+            const contactMethod = document.getElementById('contactMethodInput').value;
             if(!payMethod) return alert(dict['err_pay']);
 
             const phone = document.getElementById('vCashNum').value;
@@ -605,7 +658,13 @@
                 const res = await fetch('/api/checkout', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ vodafone_number: phone, package_name: pkg, price: price, contact_discord_id: discordId })
+                    body: JSON.stringify({ 
+                        vodafone_number: phone, 
+                        package_name: pkg, 
+                        price: price, 
+                        contact_discord_id: discordId,
+                        contact_method: contactMethod
+                    })
                 });
                 const data = await res.json();
 
@@ -615,6 +674,24 @@
                     document.getElementById('recPkg').innerText = pkg; 
                     document.getElementById('recPhone').innerText = phone;
                     document.getElementById('recId').innerText = "#" + data.order_id;
+
+                    // تحديث رسالة الإيصال بناءً على اختياره
+                    const finalSpan = document.getElementById('finalStepTarget');
+                    const finalMethod = document.getElementById('finalStepMethod');
+                    if (contactMethod === 'instagram') {
+                        finalSpan.innerText = '@fnoonstudio3';
+                        finalMethod.setAttribute('data-i18n', 'via_insta');
+                        finalMethod.innerText = dict['via_insta'];
+                    } else if (contactMethod === 'gmail') {
+                        finalSpan.innerText = 'fnoonstudio53@gmail.com';
+                        finalMethod.setAttribute('data-i18n', 'via_gmail');
+                        finalMethod.innerText = dict['via_gmail'];
+                    } else {
+                        finalSpan.innerText = '946m';
+                        finalMethod.setAttribute('data-i18n', 'via_discord');
+                        finalMethod.innerText = dict['via_discord'];
+                    }
+
                 } else { alert(data.message); }
             } catch (err) { alert(dict['err_conn']); } 
             finally { btnText.innerText = originalText; document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'auto'; }
