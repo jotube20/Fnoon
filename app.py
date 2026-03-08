@@ -100,9 +100,18 @@ async def complete_order(interaction: discord.Interaction, order_id: str):
     orders_collection.update_one({"short_id": order_id.upper()}, {"$set": {"status": 2}})
     await interaction.response.send_message(f"🎉 تم تحديد الطلب `#{order_id.upper()}` كـ مكتمل!")
 
-async def send_admins_notification(user_name, phone, pkg, order_id, contact_discord_id):
+async def send_admins_notification(user_name, phone, pkg, order_id, contact_id, contact_method):
     embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xffffff) 
-    embed.add_field(name="العميل", value=f"<@{contact_discord_id}> ({user_name})", inline=True)
+    
+    # تنسيق طريقة التواصل في الإشعار
+    if contact_method == 'instagram':
+        contact_info = f"انستجرام: {contact_id} ({user_name})"
+    elif contact_method == 'gmail':
+        contact_info = f"جيميل: {contact_id} ({user_name})"
+    else:
+        contact_info = f"<@{contact_id}> ({user_name})"
+
+    embed.add_field(name="العميل (للتواصل)", value=contact_info, inline=False)
     embed.add_field(name="رقم الكاش", value=phone, inline=True)
     embed.add_field(name="الباقة", value=pkg, inline=False)
     embed.add_field(name="رقم الإيصال", value=f"#{order_id}", inline=False)
@@ -123,7 +132,6 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('home'))
 
-# --- تسجيل دخول ديسكورد ---
 @app.route('/login/discord')
 def login_discord(): return redirect(OAUTH2_URL)
 
@@ -142,7 +150,6 @@ def callback():
     }
     return redirect(url_for('home'))
 
-# --- تسجيل دخول جوجل ---
 @app.route('/login/google')
 def login_google():
     auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?client_id={GOOGLE_CLIENT_ID}&redirect_uri={GOOGLE_REDIRECT_URI}&response_type=code&scope=openid%20email%20profile"
@@ -172,23 +179,27 @@ def checkout():
     if 'user' not in session: return jsonify({"success": False, "message": "سجل دخول أولاً!"})
     data = request.json
     contact_id = data.get('contact_discord_id')
-    try: contact_id_int = int(contact_id)
-    except ValueError: return jsonify({"success": False, "message": "أيدي الديسكورد يجب أن يحتوي على أرقام فقط!"})
-
-    guild = bot.get_guild(GUILD_ID)
-    if guild and not guild.get_member(contact_id_int):
-        return jsonify({"success": False, "message": "هذا الحساب غير موجود في سيرفر فنون."})
+    contact_method = data.get('contact_method', 'discord')
+    
+    # فحص أيدي الديسكورد لو اختار التواصل ديسكورد فقط
+    if contact_method == 'discord':
+        try: contact_id_int = int(contact_id)
+        except ValueError: return jsonify({"success": False, "message": "أيدي الديسكورد يجب أن يحتوي على أرقام فقط!"})
+        guild = bot.get_guild(GUILD_ID)
+        if guild and not guild.get_member(contact_id_int):
+            return jsonify({"success": False, "message": "هذا الحساب غير موجود في سيرفر فنون."})
 
     new_order = {
-        "user_id": session['user']['id'], "contact_discord_id": contact_id, "username": session['user']['username'],
-        "vodafone_number": data.get('vodafone_number'), "package_name": data.get('package_name'),
-        "price": data.get('price'), "status": 0, "date": datetime.now().strftime("%Y-%m-%d")
+        "user_id": session['user']['id'], "contact_discord_id": contact_id, "contact_method": contact_method,
+        "username": session['user']['username'], "vodafone_number": data.get('vodafone_number'), 
+        "package_name": data.get('package_name'), "price": data.get('price'), 
+        "status": 0, "date": datetime.now().strftime("%Y-%m-%d")
     }
     order_id = orders_collection.insert_one(new_order).inserted_id
     short_id = str(order_id)[-6:].upper()
     orders_collection.update_one({"_id": order_id}, {"$set": {"short_id": short_id}})
 
-    bot.loop.create_task(send_admins_notification(session['user']['username'], data.get('vodafone_number'), data.get('package_name'), short_id, contact_id))
+    bot.loop.create_task(send_admins_notification(session['user']['username'], data.get('vodafone_number'), data.get('package_name'), short_id, contact_id, contact_method))
     return jsonify({"success": True, "order_id": short_id})
 
 @app.route('/api/my_orders')
