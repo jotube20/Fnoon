@@ -43,7 +43,9 @@
         .pkg-features li::before { content: '✨'; font-size: 0.8rem; margin-top: 2px;}
 
         .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { width: 100%; max-width: 400px; padding: 25px 20px; text-align: center; animation: popUp 0.3s ease-out; }
+        .modal-content { width: 100%; max-width: 450px; padding: 25px 20px; text-align: center; animation: popUp 0.3s ease-out; max-height: 90vh; overflow-y: auto; }
+        /* إخفاء شريط التمرير في النافذة عشان الشياكة */
+        .modal-content::-webkit-scrollbar { width: 0px; }
         @keyframes popUp { 0% { transform: scale(0.95); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;}
@@ -258,11 +260,13 @@
     <div class="modal" id="loginModal">
         <div class="modal-content glass-panel">
             <h2 style="margin-bottom: 25px;" data-i18n="modal_login_title">اختر طريقة الدخول</h2>
-            <button class="btn-glass" style="background: rgba(88, 101, 242, 0.2); border-color: #5865F2; margin-bottom: 15px; color: #fff;" onclick="window.location.href='/login/discord'">
-                <span style="font-size: 1.2rem;">🎮</span> <span data-i18n="btn_login_discord">دخول بواسطة ديسكورد</span>
+            <button class="btn-glass" style="background: rgba(88, 101, 242, 0.15); border-color: #5865F2; margin-bottom: 15px; color: #fff;" onclick="window.location.href='/login/discord'">
+                <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" style="width: 22px; height: 22px; filter: brightness(0) invert(1);"> 
+                <span data-i18n="btn_login_discord">دخول بواسطة ديسكورد</span>
             </button>
             <button class="btn-glass" style="background: rgba(255, 255, 255, 0.1); border-color: #fff; color: #fff;" onclick="window.location.href='/login/google'">
-                <span style="font-size: 1.2rem;">🌐</span> <span data-i18n="btn_login_google">دخول بواسطة جوجل</span>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" style="width: 20px; height: 20px;"> 
+                <span data-i18n="btn_login_google">دخول بواسطة جوجل</span>
             </button>
             <button class="btn-glass btn-outline" style="margin-top: 20px;" onclick="closeModals()" data-i18n="btn_cancel">إلغاء</button>
         </div>
@@ -293,24 +297,12 @@
                         <div class="pay-item" onclick="selectPayment('vodafone', 'Vodafone Cash')">
                             <span>Vodafone Cash</span> <span class="material-icons-round" style="color:#32d74b;">check_circle</span>
                         </div>
-                        <div class="pay-item disabled">
-                            <span>PayPal</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
-                        </div>
-                        <div class="pay-item disabled">
-                            <span>STC Pay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
-                        </div>
-                        <div class="pay-item disabled">
-                            <span>UrPay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
-                        </div>
-                        <div class="pay-item disabled">
-                            <span data-i18n="pay_rajhi">الراجحي</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
-                        </div>
-                        <div class="pay-item disabled">
-                            <span>Binance</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
-                        </div>
-                        <div class="pay-item disabled">
-                            <span>Instapay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span>
-                        </div>
+                        <div class="pay-item disabled"><span>PayPal</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
+                        <div class="pay-item disabled"><span>STC Pay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
+                        <div class="pay-item disabled"><span>UrPay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
+                        <div class="pay-item disabled"><span data-i18n="pay_rajhi">الراجحي</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
+                        <div class="pay-item disabled"><span>Binance</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
+                        <div class="pay-item disabled"><span>Instapay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
                     </div>
                 </div>
 
@@ -325,7 +317,25 @@
                 <input type="hidden" id="pkgPrice">
                 <button class="btn-glass" onclick="submitOrder()"><span class="material-icons-round">payment</span> <span id="btnConfirmText" data-i18n="btn_confirm_pay">تأكيد الدفع</span></button>
                 <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_cancel">إلغاء</button>
-            {% else %}
+
+                <div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <h4 style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 12px;" data-i18n="contact_designer">للتواصل مع المصمم:</h4>
+                    <div style="display: flex; flex-direction: column; gap: 8px; text-align: start;">
+                        <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" style="width: 20px; filter: brightness(0) invert(1);">
+                            <span style="font-size: 0.95rem; color: #fff; font-family: monospace; direction: ltr; letter-spacing: 0.5px;">946m</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" style="width: 20px;">
+                            <span style="font-size: 0.95rem; color: #fff; font-family: monospace; direction: ltr; letter-spacing: 0.5px;">@fnoonstudio3</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05);">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/C/C0/Gmail_icon_%282020%29.svg" style="width: 20px;">
+                            <span style="font-size: 0.85rem; color: #fff; font-family: monospace; direction: ltr;">fnoonstudio53@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
                 <h2 style="margin-bottom: 15px;" data-i18n="modal_alert">تنبيه</h2>
                 <p style="color: #a1a1a6; margin-bottom: 20px;" data-i18n="modal_login_req">يجب تسجيل الدخول لإتمام الشراء.</p>
                 <button class="btn-glass" onclick="closeModals(); document.getElementById('loginModal').style.display='flex'" data-i18n="btn_login_now">تسجيل الدخول الآن</button>
@@ -379,6 +389,7 @@
                 modal_logout_title: "هل أنت متأكد؟", modal_logout_desc: "هل تريد فعلاً تسجيل الخروج من حسابك؟", btn_yes_logout: "نعم، خروج", btn_no_cancel: "لا، تراجع",
                 logged_via_discord: "مُسجل عبر ديسكورد", logged_via_google: "مُسجل عبر جوجل",
                 modal_pay_title: "الدفع", modal_pay_vca: "التحويل على فودافون كاش:", btn_confirm_pay: "تأكيد الدفع", btn_cancel: "إلغاء",
+                contact_designer: "للتواصل مع المصمم:",
                 modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
                 modal_success: "تم تسجيل طلبك!", lbl_pkg: "الباقة:", lbl_num: "الرقم:", lbl_rec: "رقم الإيصال:",
                 modal_last_step: "خطوة أخيرة!", modal_send_ss: "أرسل سكرين شوت للإيصال إلى 946m عبر ديسكورد.", btn_back_gal: "العودة للمعرض",
@@ -413,6 +424,7 @@
                 modal_logout_title: "Are you sure?", modal_logout_desc: "Do you really want to log out of your account?", btn_yes_logout: "Yes, Logout", btn_no_cancel: "No, Cancel",
                 logged_via_discord: "Logged via Discord", logged_via_google: "Logged via Google",
                 modal_pay_title: "Checkout", modal_pay_vca: "Transfer to Vodafone Cash:", btn_confirm_pay: "Confirm Order", btn_cancel: "Cancel",
+                contact_designer: "Contact Designer:",
                 modal_alert: "Alert", modal_login_req: "You must login to purchase.", btn_login_now: "Login Now", btn_close: "Close",
                 modal_success: "Order Submitted!", lbl_pkg: "Package:", lbl_num: "Number:", lbl_rec: "Receipt ID:",
                 modal_last_step: "One last step!", modal_send_ss: "Send a screenshot of the receipt to 946m via Discord.", btn_back_gal: "Back to Gallery",
@@ -562,7 +574,8 @@
             document.getElementById('selectedPayText').innerText = translations[currentLang]['opt_pay_select'];
             document.getElementById('selectedPayText').setAttribute('data-i18n', 'opt_pay_select');
             document.getElementById('vodafoneDetails').style.display = 'none';
-            document.getElementById('vCashNum').value = "";
+            const cashNum = document.getElementById('vCashNum');
+            if(cashNum) cashNum.value = "";
 
             const catNameAr = translations['ar'][activeDesignTypeI18n];
             document.getElementById('pkgName').value = n + " (" + catNameAr + ")";
