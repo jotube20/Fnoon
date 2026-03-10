@@ -26,7 +26,7 @@
         
         .user-auth { display: flex; align-items: center; gap: 10px; }
         .profile-wrapper { position: relative; display: flex; align-items: center; gap: 10px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; cursor: pointer; transition: 0.3s;}
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; cursor: pointer; transition: 0.3s; background: #fff;}
         .user-avatar:hover { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.3);}
         
         .profile-dropdown { display: none; position: absolute; top: 55px; width: max-content; min-width: 160px; padding: 10px; flex-direction: column; gap: 5px; z-index: 200; border-radius: 15px; }
@@ -50,7 +50,6 @@
         .input-glass { width: 100%; padding: 14px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 12px; outline: none; font-size: 1rem; text-align: center; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5); transition: 0.3s;}
         .input-glass:focus { border-color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.1);}
 
-        /* القائمة المنسدلة المخصصة لطرق الدفع والتواصل */
         .custom-pay-dropdown { position: relative; width: 100%; margin-bottom: 15px; text-align: start; }
         .pay-display { padding: 14px 20px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; color: #fff; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);}
         .pay-display:hover { background: rgba(255,255,255,0.05); }
@@ -129,7 +128,7 @@
                     <div style="display: flex; flex-direction: column; text-align: end; margin-inline-end: 5px;">
                         <span style="font-size: 0.8rem; font-weight: bold; color: #fff;">{{ user.username }}</span>
                         <span style="font-size: 0.7rem; color: #a1a1a6;" data-i18n="logged_via_{{ user.provider }}">
-                            {% if user.provider == 'google' %}مُسجل عبر جوجل{% else %}مُسجل عبر ديسكورد{% endif %}
+                            {% if user.provider == 'google' %}مُسجل عبر جوجل{% elif user.provider == 'instagram' %}مُسجل عبر انستجرام{% else %}مُسجل عبر ديسكورد{% endif %}
                         </span>
                     </div>
                     <img src="{{ user.avatar }}" referrerpolicy="no-referrer" class="user-avatar" onclick="toggleProfileMenu()" title="الملف الشخصي">
@@ -212,7 +211,6 @@
         </div>
 
         <h2 class="section-title" data-i18n="pkg_title">باقات السيرفرات</h2>
-        
         <div id="unavailableMsg" class="glass-panel" style="display: none; text-align: center; padding: 40px 20px; max-width: 600px; margin: 0 auto 30px;">
             <span class="material-icons-round" style="font-size: 3.5rem; color: #ff9f0a; margin-bottom: 15px; display: block;">construction</span>
             <h3 style="color: #fff; margin-bottom: 10px; font-size: 1.4rem;"><span data-i18n="msg_unavailable_part1">عذراً، قسم</span> <span id="unavailCatName" style="color: #ff9f0a; margin: 0 5px;"></span></h3>
@@ -259,14 +257,22 @@
     <div class="modal" id="loginModal">
         <div class="modal-content glass-panel">
             <h2 style="margin-bottom: 25px;" data-i18n="modal_login_title">اختر طريقة الدخول</h2>
+            
             <button class="btn-glass" style="background: rgba(88, 101, 242, 0.15); border-color: #5865F2; margin-bottom: 15px; color: #fff;" onclick="window.location.href='/login/discord'">
                 <img src="https://assets-global.website-files.com/6257adef93867e50d84d30e2/636e0a6a49cf127bf92de1e2_icon_clyde_blurple_RGB.png" style="width: 22px; height: 22px; filter: brightness(0) invert(1);"> 
                 <span data-i18n="btn_login_discord">دخول بواسطة ديسكورد</span>
             </button>
-            <button class="btn-glass" style="background: rgba(255, 255, 255, 0.1); border-color: #fff; color: #fff;" onclick="window.location.href='/login/google'">
+            
+            <button class="btn-glass" style="background: rgba(255, 255, 255, 0.1); border-color: #fff; margin-bottom: 15px; color: #fff;" onclick="window.location.href='/login/google'">
                 <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" style="width: 20px; height: 20px;"> 
                 <span data-i18n="btn_login_google">دخول بواسطة جوجل</span>
             </button>
+            
+            <button class="btn-glass" style="background: rgba(225, 48, 108, 0.15); border-color: #E1306C; color: #fff;" onclick="window.location.href='/login/instagram'">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" style="width: 20px; height: 20px;"> 
+                <span data-i18n="btn_login_insta">دخول بواسطة انستجرام</span>
+            </button>
+            
             <button class="btn-glass btn-outline" style="margin-top: 20px;" onclick="closeModals()" data-i18n="btn_cancel">إلغاء</button>
         </div>
     </div>
@@ -298,10 +304,7 @@
                         </div>
                         <div class="pay-item disabled"><span>PayPal</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
                         <div class="pay-item disabled"><span>STC Pay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
-                        <div class="pay-item disabled"><span>UrPay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
                         <div class="pay-item disabled"><span data-i18n="pay_rajhi">الراجحي</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
-                        <div class="pay-item disabled"><span>Binance</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
-                        <div class="pay-item disabled"><span>Instapay</span> <span class="pay-status" data-i18n="status_unavail">غير متاح</span></div>
                     </div>
                 </div>
 
@@ -328,7 +331,7 @@
 
                 <div id="vodafoneDetails" style="display: none; width: 100%;">
                     <p style="color: #a1a1a6; font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="modal_pay_vca">التحويل على فودافون كاش:</span><br><strong style="color:#fff; font-size:1.4rem; letter-spacing: 2px;">01004811745</strong></p>
-                    <input type="text" id="discordIdInput" class="input-glass" data-i18n-place="place_disc" placeholder="أيدي الديسكورد (للتواصل)" value="{% if user.provider == 'discord' %}{{ user.id }}{% elif user.provider == 'google' %}{{ user.username }}{% endif %}">
+                    <input type="text" id="discordIdInput" class="input-glass" data-i18n-place="place_disc" placeholder="أيدي الديسكورد (للتواصل)" value="">
                     <input type="tel" id="vCashNum" class="input-glass">
                 </div>
 
@@ -394,6 +397,15 @@
     </div>
 
     <script>
+        const currentUserData = {
+            provider: "{{ user.provider if user else '' }}",
+            discordId: "{{ user.id if user and user.provider == 'discord' else '' }}",
+            email: "{{ user.email if user and user.provider == 'google' else '' }}",
+            igUsername: "{{ user.username if user and user.provider == 'instagram' else '' }}"
+        };
+    </script>
+
+    <script>
         const translations = {
             ar: {
                 nav_home: "الرئيسية", nav_portfolio: "أحدث الأعمال", nav_packages: "الباقات", nav_orders: "طلباتي",
@@ -412,9 +424,9 @@
                 f_logo_anim: "شعار أحرف أو رمزي (متحرك)", f_welcome_1: "1 ترحيب ديسكورد", f_invite_1: "1 بانر إنفايت (ثابت)", f_info_unl: "صور إنفو (لا نهائية)",
                 f_profiles_3: "3 بنرات بروفايلات", f_intro_1: "1 صورة افتتاحية", f_all_unl: "صور إنفو وألعاب وبوتات (لا نهائية)",
                 price_750: "750 ج.م", price_1500: "1500 ج.م", price_2250: "2250 ج.م", btn_buy: "شراء الآن",
-                modal_login_title: "اختر طريقة الدخول", btn_login_discord: "دخول بواسطة ديسكورد", btn_login_google: "دخول بواسطة جوجل",
+                modal_login_title: "اختر طريقة الدخول", btn_login_discord: "دخول بواسطة ديسكورد", btn_login_google: "دخول بواسطة جوجل", btn_login_insta: "دخول بواسطة انستجرام",
                 modal_logout_title: "هل أنت متأكد؟", modal_logout_desc: "هل تريد فعلاً تسجيل الخروج من حسابك؟", btn_yes_logout: "نعم، خروج", btn_no_cancel: "لا، تراجع",
-                logged_via_discord: "مُسجل عبر ديسكورد", logged_via_google: "مُسجل عبر جوجل",
+                logged_via_discord: "مُسجل عبر ديسكورد", logged_via_google: "مُسجل عبر جوجل", logged_via_instagram: "مُسجل عبر انستجرام",
                 modal_pay_title: "الدفع", modal_pay_vca: "التحويل على فودافون كاش:", btn_confirm_pay: "تأكيد الدفع", btn_cancel: "إلغاء",
                 contact_designer: "للتواصل مع المصمم:",
                 modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
@@ -449,9 +461,9 @@
                 f_logo_anim: "Animated Logo", f_welcome_1: "1 Welcome", f_invite_1: "1 Invite Banner", f_info_unl: "Unlimited Info Images",
                 f_profiles_3: "3 Profile Banners", f_intro_1: "1 Intro Image", f_all_unl: "Unlimited Images & Bots",
                 price_750: "750 EGP", price_1500: "1500 EGP", price_2250: "2250 EGP", btn_buy: "Buy Now",
-                modal_login_title: "Select Login Method", btn_login_discord: "Login with Discord", btn_login_google: "Login with Google",
+                modal_login_title: "Select Login Method", btn_login_discord: "Login with Discord", btn_login_google: "Login with Google", btn_login_insta: "Login with Instagram",
                 modal_logout_title: "Are you sure?", modal_logout_desc: "Do you really want to log out of your account?", btn_yes_logout: "Yes, Logout", btn_no_cancel: "No, Cancel",
-                logged_via_discord: "Logged via Discord", logged_via_google: "Logged via Google",
+                logged_via_discord: "Logged via Discord", logged_via_google: "Logged via Google", logged_via_instagram: "Logged via Instagram",
                 modal_pay_title: "Checkout", modal_pay_vca: "Transfer to Vodafone Cash:", btn_confirm_pay: "Confirm Order", btn_cancel: "Cancel",
                 contact_designer: "Contact Designer:",
                 modal_alert: "Alert", modal_login_req: "You must login to purchase.", btn_login_now: "Login Now", btn_close: "Close",
@@ -486,13 +498,11 @@
                 if(dict[key]) el.innerHTML = dict[key]; 
             });
 
-            // ترجمة الـ Placeholders
             const discInput = document.getElementById('discordIdInput');
             if(discInput) {
                 const placeKey = discInput.getAttribute('data-i18n-place') || 'place_disc';
                 discInput.placeholder = dict[placeKey];
             }
-            
             const cashInput = document.getElementById('vCashNum');
             if(cashInput) cashInput.placeholder = dict['place_phone'];
             
@@ -603,7 +613,6 @@
 
         function selectContact(method, textI18n, placeholderI18n) {
             document.getElementById('contactMethodInput').value = method;
-            
             const textSpan = document.getElementById('selectedContactText');
             textSpan.setAttribute('data-i18n', textI18n);
             textSpan.innerText = translations[currentLang][textI18n];
@@ -626,12 +635,24 @@
             document.getElementById('selectedPayText').innerText = translations[currentLang]['opt_pay_select'];
             document.getElementById('selectedPayText').setAttribute('data-i18n', 'opt_pay_select');
             document.getElementById('vodafoneDetails').style.display = 'none';
-            const cashNum = document.getElementById('vCashNum');
-            if(cashNum) cashNum.value = "";
+            if(document.getElementById('vCashNum')) document.getElementById('vCashNum').value = "";
 
             const catNameAr = translations['ar'][activeDesignTypeI18n];
             document.getElementById('pkgName').value = n + " (" + catNameAr + ")";
             document.getElementById('pkgPrice').value = p;
+
+            // --- التعبئة الذكية (Smart Autofill) ---
+            const inputField = document.getElementById('discordIdInput');
+            if(currentUserData.provider === 'google') {
+                selectContact('gmail', 'opt_contact_gmail', 'place_email');
+                inputField.value = currentUserData.email;
+            } else if (currentUserData.provider === 'instagram') {
+                selectContact('instagram', 'opt_contact_insta', 'place_insta');
+                inputField.value = currentUserData.igUsername;
+            } else if (currentUserData.provider === 'discord') {
+                selectContact('discord', 'opt_contact_discord', 'place_disc');
+                inputField.value = currentUserData.discordId;
+            }
         }
 
         function closeModals() { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }
@@ -659,11 +680,8 @@
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ 
-                        vodafone_number: phone, 
-                        package_name: pkg, 
-                        price: price, 
-                        contact_discord_id: discordId,
-                        contact_method: contactMethod
+                        vodafone_number: phone, package_name: pkg, price: price, 
+                        contact_discord_id: discordId, contact_method: contactMethod
                     })
                 });
                 const data = await res.json();
@@ -675,7 +693,6 @@
                     document.getElementById('recPhone').innerText = phone;
                     document.getElementById('recId').innerText = "#" + data.order_id;
 
-                    // تحديث رسالة الإيصال بناءً على اختياره
                     const finalSpan = document.getElementById('finalStepTarget');
                     const finalMethod = document.getElementById('finalStepMethod');
                     if (contactMethod === 'instagram') {
@@ -691,8 +708,10 @@
                         finalMethod.setAttribute('data-i18n', 'via_discord');
                         finalMethod.innerText = dict['via_discord'];
                     }
-
-                } else { alert(data.message); }
+                } else { 
+                    // رسالة الحماية (لو عنده طلب تاني شغال) هتظهر هنا!
+                    alert(data.message); 
+                }
             } catch (err) { alert(dict['err_conn']); } 
             finally { btnText.innerText = originalText; document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'auto'; }
         }
@@ -714,6 +733,15 @@
                         <p style="color:#a1a1a6; font-size:0.85rem;">${dict['lbl_order_id']} #${o.short_id}</p>
                         <div class="progress-bar status-${o.status}">
                             <div class="step"></div><div class="step"></div><div class="step"></div>
+                        </div>
+                        <div class="status-text">${sText}</div>
+                    </div>`;
+                }).join('');
+            } catch (err) { list.innerHTML = `<p style="color:#ff3b30; text-align:center;">${dict['err_conn']}</p>`; }
+        }
+    </script>
+</body>
+</html>
                         </div>
                         <div class="status-text">${sText}</div>
                     </div>`;
