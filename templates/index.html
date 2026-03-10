@@ -131,11 +131,11 @@
                             {% if user.provider == 'google' %}مُسجل عبر جوجل{% else %}مُسجل عبر ديسكورد{% endif %}
                         </span>
                     </div>
-                    <img src="{{ user.avatar }}" referrerpolicy="no-referrer" class="user-avatar" onclick="toggleProfileMenu()" title="الملف الشخصي">
+                    <img src="{{ user.avatar }}" referrerpolicy="no-referrer" class="user-avatar" onclick="toggleProfileMenu(event)" title="الملف الشخصي">
                     <div id="profileDropdown" class="glass-panel profile-dropdown">
-                        <div class="dropdown-item" onclick="event.stopPropagation(); confirmLogout();">
-    <span class="material-icons-round">logout</span> <span data-i18n="btn_logout">تسجيل خروج</span>
-                      </div>
+                        <div class="dropdown-item" onclick="window.location.href='/logout'">
+                            <span class="material-icons-round">logout</span> <span data-i18n="btn_logout">تسجيل خروج</span>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -269,17 +269,6 @@
         </div>
     </div>
 
-    <div class="modal" id="logoutConfirmModal">
-        <div class="modal-content glass-panel">
-            <h2 style="margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;"><span class="material-icons-round" style="color: #ff3b30;">logout</span> <span data-i18n="modal_logout_title">هل أنت متأكد؟</span></h2>
-            <p style="color: #a1a1a6; margin-bottom: 25px;" data-i18n="modal_logout_desc">هل تريد فعلاً تسجيل الخروج من حسابك؟</p>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-glass" style="background: rgba(255, 59, 48, 0.15); border-color: rgba(255, 59, 48, 0.3); color: #ff3b30;" onclick="window.location.href='/logout'" data-i18n="btn_yes_logout">نعم، خروج</button>
-                <button class="btn-glass btn-outline" onclick="closeModals()" data-i18n="btn_no_cancel">لا، تراجع</button>
-            </div>
-        </div>
-    </div>
-
     <div class="modal" id="checkoutModal">
         <div class="modal-content glass-panel" id="checkoutForm">
             {% if user %}
@@ -370,7 +359,6 @@
                 <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;" data-i18n="lbl_num">الرقم:</strong> <span id="recPhone"></span></p>
                 <p><strong style="color:#a1a1a6;" data-i18n="lbl_rec">رقم الإيصال:</strong> <span id="recId" style="color: #fff; font-weight:bold; letter-spacing:1px;"></span></p>
             </div>
-            
             <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
                 <strong style="color: #fff; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">notifications_active</span> <span data-i18n="modal_last_step">خطوة أخيرة!</span></strong>
                 <p style="margin-top:8px; color:#d1d1d6; line-height: 1.6;">
@@ -407,7 +395,7 @@
             <span class="material-icons-round" style="cursor: pointer; color: #fff;" onclick="toggleChatWindow()">close</span>
         </div>
         <div id="custMessagesContainer" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; background: rgba(0,0,0,0.3);">
-            </div>
+        </div>
         <div id="custInputArea" style="padding: 15px; background: rgba(0,0,0,0.6); border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; align-items: center;">
             <button class="btn-attach" onclick="document.getElementById('custImgUpload').click()" style="padding: 10px; border-radius: 10px; background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; display: flex; align-items: center; cursor: pointer; transition: 0.3s;">
                 <span class="material-icons-round" style="font-size: 1.2rem;">attach_file</span>
@@ -448,11 +436,11 @@
                 f_profiles_3: "3 بنرات بروفايلات", f_intro_1: "1 صورة افتتاحية", f_all_unl: "صور إنفو وألعاب وبوتات (لا نهائية)",
                 price_750: "750 ج.م", price_1500: "1500 ج.م", price_2250: "2250 ج.م", btn_buy: "شراء الآن",
                 modal_login_title: "اختر طريقة الدخول", btn_login_discord: "دخول بواسطة ديسكورد", btn_login_google: "دخول بواسطة جوجل",
-                modal_logout_title: "هل أنت متأكد؟", modal_logout_desc: "هل تريد فعلاً تسجيل الخروج من حسابك؟", btn_yes_logout: "نعم، خروج", btn_no_cancel: "لا، تراجع",
+                btn_cancel: "إلغاء", btn_close: "إغلاق",
                 logged_via_discord: "مُسجل عبر ديسكورد", logged_via_google: "مُسجل عبر جوجل",
-                modal_pay_title: "الدفع", modal_pay_vca: "التحويل على فودافون كاش:", btn_confirm_pay: "تأكيد الدفع", btn_cancel: "إلغاء",
+                modal_pay_title: "الدفع", modal_pay_vca: "التحويل على فودافون كاش:", btn_confirm_pay: "تأكيد الدفع",
                 contact_designer: "للتواصل مع المصمم:",
-                modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن", btn_close: "إغلاق",
+                modal_alert: "تنبيه", modal_login_req: "يجب تسجيل الدخول لإتمام الشراء.", btn_login_now: "تسجيل الدخول الآن",
                 modal_success: "تم تسجيل طلبك!", lbl_pkg: "الباقة:", lbl_num: "الرقم:", lbl_rec: "رقم الإيصال:",
                 modal_last_step: "خطوة أخيرة!", modal_send_ss_base: "أرسل سكرين شوت للإيصال إلى", 
                 via_discord: "عبر ديسكورد.", via_insta: "عبر انستجرام.", via_gmail: "عبر جيميل.", btn_back_gal: "العودة للمعرض",
@@ -486,11 +474,11 @@
                 f_profiles_3: "3 Profile Banners", f_intro_1: "1 Intro Image", f_all_unl: "Unlimited Images & Bots",
                 price_750: "750 EGP", price_1500: "1500 EGP", price_2250: "2250 EGP", btn_buy: "Buy Now",
                 modal_login_title: "Select Login Method", btn_login_discord: "Login with Discord", btn_login_google: "Login with Google",
-                modal_logout_title: "Are you sure?", modal_logout_desc: "Do you really want to log out of your account?", btn_yes_logout: "Yes, Logout", btn_no_cancel: "No, Cancel",
+                btn_cancel: "Cancel", btn_close: "Close",
                 logged_via_discord: "Logged via Discord", logged_via_google: "Logged via Google",
-                modal_pay_title: "Checkout", modal_pay_vca: "Transfer to Vodafone Cash:", btn_confirm_pay: "Confirm Order", btn_cancel: "Cancel",
+                modal_pay_title: "Checkout", modal_pay_vca: "Transfer to Vodafone Cash:", btn_confirm_pay: "Confirm Order",
                 contact_designer: "Contact Designer:",
-                modal_alert: "Alert", modal_login_req: "You must login to purchase.", btn_login_now: "Login Now", btn_close: "Close",
+                modal_alert: "Alert", modal_login_req: "You must login to purchase.", btn_login_now: "Login Now",
                 modal_success: "Order Submitted!", lbl_pkg: "Package:", lbl_num: "Number:", lbl_rec: "Receipt ID:",
                 modal_last_step: "One last step!", modal_send_ss_base: "Send a screenshot of the receipt to", 
                 via_discord: "via Discord.", via_insta: "via Instagram.", via_gmail: "via Gmail.", btn_back_gal: "Back to Gallery",
@@ -536,19 +524,22 @@
             if(document.getElementById('ordersModal').style.display === 'flex') openOrders();
         }
 
-        function toggleProfileMenu() {
-            document.getElementById("profileDropdown").classList.toggle("show");
+        // إصلاح القائمة המنسدلة
+        function toggleProfileMenu(event) {
+            if(event) event.stopPropagation();
+            var pMenu = document.getElementById("profileDropdown");
+            pMenu.classList.toggle("show");
             if(currentLang === 'en') {
-                document.getElementById("profileDropdown").style.left = "auto";
-                document.getElementById("profileDropdown").style.right = "0";
+                pMenu.style.left = "auto";
+                pMenu.style.right = "0";
             } else {
-                document.getElementById("profileDropdown").style.right = "auto";
-                document.getElementById("profileDropdown").style.left = "0";
+                pMenu.style.right = "auto";
+                pMenu.style.left = "0";
             }
         }
 
         window.onclick = function(event) {
-            if (!event.target.closest('.user-avatar')) {
+            if (!event.target.closest('.user-avatar') && !event.target.closest('.profile-dropdown')) {
                 var pMenu = document.getElementById("profileDropdown");
                 if (pMenu && pMenu.classList.contains('show')) pMenu.classList.remove('show');
             }
@@ -760,12 +751,10 @@
         let activeChatOrderId = null;
         let custChatInterval = null;
 
-        // الدالة دي بتشتغل أول ما الصفحة تحمل عشان تشوف لو الزبون عنده طلب عشان تظهرله زرار الشات
         async function initCustomerChat() {
             try {
                 const res = await fetch('/api/my_orders');
                 const orders = await res.json();
-                // بندور على أي طلب شغال
                 if(orders.length > 0) {
                     const latest = orders[0]; 
                     activeChatOrderId = latest.short_id;
@@ -799,24 +788,24 @@
                 
                 const container = document.getElementById('custMessagesContainer');
                 let isScrolledToBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
-                container.innerHTML = '';
+                
+                let htmlContent = '';
 
-                data.messages.forEach(msg => {
-                    // للعميل، رسايله هو اللي عالشمال (زي الواتساب) ورسايلك إنت (المصمم) عاليمين
+                for(let i = 0; i < data.messages.length; i++) {
+                    let msg = data.messages[i];
                     let align = !msg.is_admin ? 'align-self: flex-start; background: rgba(0, 0, 0, 0.5); border-bottom-right-radius: 5px;' : 'align-self: flex-end; background: rgba(255, 255, 255, 0.15); border-bottom-left-radius: 5px;';
                     let timeAlign = !msg.is_admin ? 'right: 5px;' : 'left: 5px;';
                     
                     let content = '';
-                    if(msg.text) content += `<div>${msg.text}</div>`;
-                    if(msg.image_url) content += `<img src="${msg.image_url}" onclick="window.open('${msg.image_url}', '_blank')" style="max-width:100%; border-radius:10px; margin-top:5px; cursor:pointer; border: 1px solid rgba(255,255,255,0.1);">`;
+                    if(msg.text) content += '<div>' + msg.text + '</div>';
+                    if(msg.image_url) content += '<img src="' + msg.image_url + '" onclick="window.open(\'' + msg.image_url + '\', \'_blank\')" style="max-width:100%; border-radius:10px; margin-top:5px; cursor:pointer; border: 1px solid rgba(255,255,255,0.1);">';
 
-                    container.innerHTML += `
-                        <div style="max-width: 80%; padding: 12px 18px; border-radius: 20px; position: relative; font-size: 0.95rem; line-height: 1.5; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; ${align}">
-                            ${content}
-                            <div style="font-size: 0.65rem; color: #a1a1a6; position: absolute; bottom: -18px; white-space: nowrap; ${timeAlign}">${msg.time_display}</div>
-                        </div>
-                    `;
-                });
+                    htmlContent += '<div style="max-width: 80%; padding: 12px 18px; border-radius: 20px; position: relative; font-size: 0.95rem; line-height: 1.5; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; ' + align + '">' +
+                        content +
+                        '<div style="font-size: 0.65rem; color: #a1a1a6; position: absolute; bottom: -18px; white-space: nowrap; ' + timeAlign + '">' + msg.time_display + '</div>' +
+                    '</div>';
+                }
+                container.innerHTML = htmlContent;
 
                 if(isScrolledToBottom) container.scrollTop = container.scrollHeight;
 
