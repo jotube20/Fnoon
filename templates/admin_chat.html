@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fnoon Studio | لوحة المصمم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root { --bg-color: #080808; --text-color: #ffffff; --glass-white: rgba(255, 255, 255, 0.12); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); height: 100vh; display: flex; overflow: hidden; }
+
+        .glass-panel { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+
+        .sidebar { width: 350px; border-left: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        .order-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .order-list::-webkit-scrollbar { width: 5px; }
+        .order-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+        
+        .chat-card { padding: 15px; margin-bottom: 10px; border-radius: 12px; cursor: pointer; transition: 0.3s; border: 1px solid transparent; }
+        .chat-card:hover { background: rgba(255,255,255,0.08); }
+        .chat-card.active { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3); }
+        .chat-card h4 { font-size: 1.1rem; margin-bottom: 5px; display: flex; justify-content: space-between; }
+        .chat-card p { color: #a1a1a6; font-size: 0.85rem; line-height: 1.5; }
+
+        .chat-area { flex: 1; display: flex; flex-direction: column; background: radial-gradient(circle at center, rgba(255,255,255,0.03), transparent); }
+        .chat-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.5); }
+        .client-info { display: flex; flex-direction: column; gap: 5px; }
+        
+        .messages-container { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .messages-container::-webkit-scrollbar { width: 5px; }
+        .messages-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+
+        .msg-bubble { max-width: 60%; padding: 12px 18px; border-radius: 20px; position: relative; font-size: 1rem; line-height: 1.5; word-wrap: break-word; }
+        .msg-admin { background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255,255,255,0.3); align-self: flex-end; border-bottom-left-radius: 5px; }
+        .msg-client { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255,255,255,0.1); align-self: flex-start; border-bottom-right-radius: 5px; }
+        .msg-time { font-size: 0.7rem; color: #a1a1a6; position: absolute; bottom: -20px; white-space: nowrap; }
+        .msg-admin .msg-time { left: 5px; }
+        .msg-client .msg-time { right: 5px; }
+        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
+
+        .chat-input-area { padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 10px; align-items: center; background: rgba(0,0,0,0.5); }
+        .input-glass { flex: 1; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 15px; outline: none; font-size: 1rem; transition: 0.3s; }
+        .input-glass:focus { background: rgba(255,255,255,0.1); }
+        .btn-send { background: #fff; color: #000; border: none; padding: 15px; border-radius: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        .btn-send:hover { transform: scale(1.05); }
+        .btn-attach { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 15px; border-radius: 15px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.3s; }
+        .btn-attach:hover { background: rgba(255,255,255,0.1); }
+        .system-msg { align-self: center; background: rgba(255,59,48,0.15); color: #ff3b30; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; border: 1px solid rgba(255,59,48,0.3); }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar glass-panel">
+        <div class="sidebar-header">
+            <h2 style="display:flex; justify-content:center; align-items:center; gap:8px;">
+                <span class="material-icons-round">admin_panel_settings</span> لوحة المصمم
+            </h2>
+            <p style="font-size: 0.8rem; color: #a1a1a6; margin-top: 5px;">أهلاً، {{ user.username }}</p>
+            <button onclick="window.location.href='/'" style="margin-top: 10px; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; cursor: pointer;">العودة للموقع</button>
+        </div>
+        <div class="order-list">
+            {% for order in orders %}
+            <div class="chat-card" onclick="openChat('{{ order.short_id }}', '{{ order.username }}', '{{ order.package_name }}', '{{ order.price }}', '{{ order.vodafone_number }}', '{{ order.contact_method }}', '{{ order.contact_discord_id }}', this)">
+                <h4>#{{ order.short_id }} <span style="font-size: 0.8rem; background: {% if order.status == 2 %}#32d74b{% elif order.status == 1 %}#ff9f0a{% else %}#a1a1a6{% endif %}; color:#000; padding:2px 6px; border-radius:5px;">{% if order.status == 2 %}مكتمل{% elif order.status == 1 %}جاري{% else %}انتظار{% endif %}</span></h4>
+                <p>العميل: {{ order.username }}</p>
+                <p>الباقة: {{ order.package_name }}</p>
+            </div>
+            {% endfor %}
+            {% if not orders %}
+                <p style="text-align: center; color: #a1a1a6; margin-top: 20px;">لا توجد طلبات حتى الآن.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="chat-area">
+        <div id="noChatSelected" style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#a1a1a6;">
+            <span class="material-icons-round" style="font-size: 5rem; opacity: 0.5; margin-bottom: 15px;">forum</span>
+            <h2>اختر محادثة للبدء</h2>
+        </div>
+
+        <div id="activeChatBox" style="display:none; flex:1; flex-direction:column; height: 100%;">
+            <div class="chat-header">
+                <div class="client-info">
+                    <h3 id="headClientName" style="color: #fff;">اسم العميل</h3>
+                    <p style="color: #a1a1a6; font-size: 0.9rem;">الطلب: <span id="headPkg" style="color:#fff;"></span> (<span id="headPrice" style="color:#32d74b;"></span>)</p>
+                    <p style="color: #a1a1a6; font-size: 0.9rem;">رقم الكاش: <span id="headPhone" style="color:#fff;"></span></p>
+                </div>
+                <div style="text-align: end;">
+                    <span style="background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 8px; font-size: 0.85rem; border: 1px solid rgba(255,255,255,0.2); display: inline-flex; align-items: center; gap: 5px;">
+                        <span class="material-icons-round" style="font-size:1.2rem;" id="headContactIcon">contact_mail</span>
+                        <span id="headContactDetails" style="font-family: monospace; letter-spacing: 0.5px;"></span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messagesContainer"></div>
+
+            <div class="chat-input-area" id="inputArea">
+                <button class="btn-attach" onclick="document.getElementById('imgUpload').click()" title="إرفاق صورة"><span class="material-icons-round">attach_file</span></button>
+                <input type="file" id="imgUpload" accept="image/*" style="display: none;" onchange="uploadImage()">
+                <input type="text" id="msgInput" class="input-glass" placeholder="اكتب رسالتك هنا..." onkeypress="if(event.key === 'Enter') sendAdminMsg()">
+                <button class="btn-send" onclick="sendAdminMsg()"><span class="material-icons-round">send</span></button>
+            </div>
+            
+            <div id="closedAlert" style="display:none; padding: 20px; text-align: center; background: rgba(0,0,0,0.5); border-top: 1px solid rgba(255,255,255,0.1);">
+                <span class="system-msg">تم إغلاق المحادثة لانتهاء الطلب (مر 24 ساعة).</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentOrderId = null;
+        let chatRefreshInterval = null;
+
+        function openChat(orderId, username, pkg, price, phone, cMethod, cId, cardElement) {
+            document.querySelectorAll('.chat-card').forEach(c => c.classList.remove('active'));
+            cardElement.classList.add('active');
+
+            currentOrderId = orderId;
+            document.getElementById('noChatSelected').style.display = 'none';
+            document.getElementById('activeChatBox').style.display = 'flex';
+
+            document.getElementById('headClientName').innerText = username + " (#" + orderId + ")";
+            document.getElementById('headPkg').innerText = pkg;
+            document.getElementById('headPrice').innerText = price + " ج.م";
+            document.getElementById('headPhone').innerText = phone;
+            document.getElementById('headContactDetails').innerText = cId;
+            
+            let icon = 'contact_mail';
+            if(cMethod === 'discord') icon = 'discord';
+            else if(cMethod === 'instagram') icon = 'photo_camera';
+            else if(cMethod === 'gmail') icon = 'mail';
+            document.getElementById('headContactIcon').innerText = icon;
+
+            fetchMessages();
+            if(chatRefreshInterval) clearInterval(chatRefreshInterval);
+            chatRefreshInterval = setInterval(fetchMessages, 3000); 
+        }
+
+        async function fetchMessages() {
+            if(!currentOrderId) return;
+            try {
+                const res = await fetch('/api/chat/' + currentOrderId);
+                const data = await res.json();
+                
+                const container = document.getElementById('messagesContainer');
+                
+                // حفظ التمرير لأسفل إذا كان المستخدم في أسفل الشات
+                let isScrolledToBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
+
+                container.innerHTML = '';
+
+                data.messages.forEach(msg => {
+                    let bubbleClass = msg.is_admin ? 'msg-admin' : 'msg-client';
+                    let content = '';
+                    if(msg.text) content += `<div>${msg.text}</div>`;
+                    if(msg.image_url) content += `<img src="${msg.image_url}" class="msg-img" onclick="window.open('${msg.image_url}', '_blank')">`;
+                    
+                    container.innerHTML += `
+                        <div class="msg-bubble ${bubbleClass}">
+                            ${content}
+                            <div class="msg-time">${msg.time_display}</div>
+                        </div>
+                    `;
+                });
+
+                if(isScrolledToBottom) {
+                    container.scrollTop = container.scrollHeight;
+                }
+
+                if(data.chat_closed) {
+                    document.getElementById('inputArea').style.display = 'none';
+                    document.getElementById('closedAlert').style.display = 'block';
+                } else {
+                    document.getElementById('inputArea').style.display = 'flex';
+                    document.getElementById('closedAlert').style.display = 'none';
+                }
+
+            } catch (e) { console.error(e); }
+        }
+
+        async function sendAdminMsg(imgUrl = '') {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if(!text && !imgUrl) return;
+
+            input.value = ''; 
+            try {
+                await fetch('/api/chat/' + currentOrderId, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ text: text, image_url: imgUrl })
+                });
+                fetchMessages(); 
+            } catch (e) { alert('خطأ في الإرسال'); }
+        }
+
+        async function uploadImage() {
+            const file = document.getElementById('imgUpload').files[0];
+            if(!file) return;
+
+            const attachBtn = document.querySelector('.btn-attach');
+            const originalIcon = attachBtn.innerHTML;
+            attachBtn.innerHTML = '<span class="material-icons-round" style="animation: rotate 1s linear infinite;">sync</span>';
+            attachBtn.style.pointerEvents = 'none';
+
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async function () {
+                const base64String = reader.result.split(',')[1]; 
+                
+                try {
+                    const res = await fetch('/api/chat/' + currentOrderId, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ text: '', image_base64: base64String })
+                    });
+                    const data = await res.json();
+                    if(!data.success && data.message) alert(data.message);
+                    fetchMessages(); 
+                } catch (e) { alert('حدث خطأ أثناء رفع الصورة'); }
+                
+                attachBtn.innerHTML = originalIcon;
+                attachBtn.style.pointerEvents = 'auto';
+                document.getElementById('imgUpload').value = '';
+            };
+        }
+    </script>
+</body>
+</html>
