@@ -133,9 +133,9 @@
                     </div>
                     <img src="{{ user.avatar }}" referrerpolicy="no-referrer" class="user-avatar" onclick="toggleProfileMenu()" title="الملف الشخصي">
                     <div id="profileDropdown" class="glass-panel profile-dropdown">
-                        <div class="dropdown-item" onclick="confirmLogout()">
-                            <span class="material-icons-round">logout</span> <span data-i18n="btn_logout">تسجيل خروج</span>
-                        </div>
+                        <div class="dropdown-item" onclick="window.location.href='/logout'">
+    <span class="material-icons-round">logout</span> <span data-i18n="btn_logout">تسجيل خروج</span>
+                      </div>
                     </div>
                 </div>
             {% else %}
