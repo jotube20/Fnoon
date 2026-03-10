@@ -258,7 +258,9 @@ def send_message(order_id):
             if res.status_code == 200 and res_data.get("data"):
                 image_url = res_data["data"]["url"]
             else:
-                return jsonify({"success": False, "message": "فشل رفع الصورة لـ ImgBB."})
+                # الكود ده هيجيب رسالة الخطأ الأصلية من موقع ImgBB ويعرضها لك
+                error_msg = res_data.get("error", {}).get("message", "خطأ غير معروف")
+                return jsonify({"success": False, "message": f"رفض ImgBB الصورة والسبب: {error_msg}"})
         except Exception as e:
             return jsonify({"success": False, "message": "حدث خطأ أثناء رفع الصورة."})
     
