@@ -34,6 +34,11 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "https://fnoon.onrender.com/google_callback")
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
+# إعدادات انستجرام
+INSTAGRAM_CLIENT_ID = os.getenv("INSTAGRAM_CLIENT_ID")
+INSTAGRAM_CLIENT_SECRET = os.getenv("INSTAGRAM_CLIENT_SECRET")
+INSTAGRAM_REDIRECT_URI = os.getenv("INSTAGRAM_REDIRECT_URI", "https://fnoon.onrender.com/instagram_callback")
+
 client = MongoClient(MONGO_URI)
 db = client['fnoon_studio']
 orders_collection = db['orders']
@@ -48,10 +53,10 @@ async def on_ready():
     guild = discord.Object(id=GUILD_ID)
     bot.tree.copy_global_to(guild=guild)
     await bot.tree.sync(guild=guild)
-    print(f'✅ البوت {bot.user.name} جاهز ومربوط بالموقع وأوامر السلاش تعمل!')
+    print(f'✅ البوت {bot.user.name} جاهز ومربوط بالموقع!')
 
-@bot.tree.command(name="add_portfolio", description="إضافة تصميم لمعرض الأعمال في الموقع")
-@app_commands.describe(title="اسم التصميم", category="نوع التصميم", image="ارفع صورة التصميم بجودتها الأصلية هنا")
+@bot.tree.command(name="add_portfolio", description="إضافة تصميم لمعرض الأعمال")
+@app_commands.describe(title="اسم التصميم", category="نوع التصميم", image="ارفع الصورة")
 @app_commands.choices(category=[
     app_commands.Choice(name="سيرفرات ديسكورد", value="ديسكورد"),
     app_commands.Choice(name="بوسترات", value="بوسترات"),
@@ -67,26 +72,17 @@ async def add_portfolio(interaction: discord.Interaction, title: str, category: 
         return await interaction.response.send_message("❌ يرجى إرفاق صورة صالحة.", ephemeral=True)
 
     await interaction.response.defer(ephemeral=False)
-    
     try:
         img_data = await image.read()
         b64_img = base64.b64encode(img_data).decode('utf-8')
-        
         payload = {"key": IMGBB_API_KEY, "image": b64_img}
         res = requests.post("https://api.imgbb.com/1/upload", data=payload)
         res_data = res.json()
-        
         if res.status_code == 200 and res_data.get("data"):
-            permanent_url = res_data["data"]["url"]
-            portfolio_collection.insert_one({
-                "title": title, "category": category.name,
-                "image_url": permanent_url, "date": datetime.now().strftime("%Y-%m-%d")
-            })
-            await interaction.followup.send(f"✅ تم رفع **{title}** لـ **{category.name}**!\nالرابط الدائم: {permanent_url}")
-        else:
-            await interaction.followup.send("❌ فشل الرفع لـ ImgBB. تأكد من إضافة مفتاح الـ API في Render.")
-    except Exception as e:
-        await interaction.followup.send(f"❌ حدث خطأ أثناء الرفع: {e}")
+            portfolio_collection.insert_one({"title": title, "category": category.name, "image_url": res_data["data"]["url"], "date": datetime.now().strftime("%Y-%m-%d")})
+            await interaction.followup.send(f"✅ تم رفع **{title}**!\nالرابط: {res_data['data']['url']}")
+        else: await interaction.followup.send("❌ فشل الرفع لـ ImgBB.")
+    except Exception as e: await interaction.followup.send(f"❌ حدث خطأ: {e}")
 
 @bot.tree.command(name="accept", description="قبول طلب والبدء في العمل عليه")
 async def accept_order(interaction: discord.Interaction, order_id: str):
@@ -102,14 +98,9 @@ async def complete_order(interaction: discord.Interaction, order_id: str):
 
 async def send_admins_notification(user_name, phone, pkg, order_id, contact_id, contact_method):
     embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xffffff) 
-    
-    # تنسيق طريقة التواصل في الإشعار
-    if contact_method == 'instagram':
-        contact_info = f"انستجرام: {contact_id} ({user_name})"
-    elif contact_method == 'gmail':
-        contact_info = f"جيميل: {contact_id} ({user_name})"
-    else:
-        contact_info = f"<@{contact_id}> ({user_name})"
+    if contact_method == 'instagram': contact_info = f"انستجرام: {contact_id} ({user_name})"
+    elif contact_method == 'gmail': contact_info = f"جيميل: {contact_id} ({user_name})"
+    else: contact_info = f"<@{contact_id}> ({user_name})"
 
     embed.add_field(name="العميل (للتواصل)", value=contact_info, inline=False)
     embed.add_field(name="رقم الكاش", value=phone, inline=True)
@@ -122,7 +113,7 @@ async def send_admins_notification(user_name, phone, pkg, order_id, contact_id, 
         except Exception: pass
 
 # ==========================================
-# مسارات الموقع
+# مسارات الموقع وتسجيل الدخول
 # ==========================================
 @app.route('/')
 def home(): return render_template('index.html', user=session.get('user'))
@@ -165,23 +156,60 @@ def google_callback():
     access_token = r.json().get("access_token")
     if not access_token: return redirect(url_for('home'))
     user_data = requests.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access_token}"}).json()
+    
+    # التعديل هنا: سحب الإيميل وتخزينه في الجلسة
     session['user'] = {
         'id': user_data['id'], 'username': user_data.get('name', 'Google User'),
-        'avatar': user_data.get('picture', ''), 'provider': 'google'
+        'email': user_data.get('email', ''), 'avatar': user_data.get('picture', ''), 'provider': 'google'
     }
     return redirect(url_for('home'))
 
+@app.route('/login/instagram')
+def login_instagram():
+    auth_url = f"https://api.instagram.com/oauth/authorize?client_id={INSTAGRAM_CLIENT_ID}&redirect_uri={INSTAGRAM_REDIRECT_URI}&scope=user_profile&response_type=code"
+    return redirect(auth_url)
+
+@app.route('/instagram_callback')
+def instagram_callback():
+    code = request.args.get('code')
+    if not code: return redirect(url_for('home'))
+    token_url = "https://api.instagram.com/oauth/access_token"
+    data = { "client_id": INSTAGRAM_CLIENT_ID, "client_secret": INSTAGRAM_CLIENT_SECRET, "grant_type": "authorization_code", "redirect_uri": INSTAGRAM_REDIRECT_URI, "code": code }
+    r = requests.post(token_url, data=data)
+    res_data = r.json()
+    access_token = res_data.get("access_token")
+    user_id = res_data.get("user_id")
+    if not access_token: return redirect(url_for('home'))
+    
+    user_info_url = f"https://graph.instagram.com/{user_id}?fields=id,username&access_token={access_token}"
+    user_info = requests.get(user_info_url).json()
+    
+    # الانستجرام لا يعطي صورة بروفايل بسهولة في الأساسيات، سنضع لوجو انستجرام كصورة افتراضية
+    session['user'] = {
+        'id': user_info.get('id'), 'username': user_info.get('username', 'Instagram User'),
+        'avatar': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg', 'provider': 'instagram'
+    }
+    return redirect(url_for('home'))
+
+# ==========================================
+# الـ APIs
+# ==========================================
 @app.route('/api/portfolio')
 def get_portfolio(): return jsonify(list(portfolio_collection.find({}, {'_id': 0}).sort('_id', -1)))
 
 @app.route('/api/checkout', methods=['POST'])
 def checkout():
     if 'user' not in session: return jsonify({"success": False, "message": "سجل دخول أولاً!"})
+    
+    # التعديل الجبار: فحص ما إذا كان للعميل طلب قيد التنفيذ (منع السبام)
+    active_order = orders_collection.find_one({"user_id": session['user']['id'], "status": {"$in": [0, 1]}})
+    if active_order:
+        return jsonify({"success": False, "message": "عذراً، لديك طلب قيد التنفيذ بالفعل! يرجى الانتظار حتى يكتمل لتتمكن من طلب تصميم جديد."})
+
     data = request.json
     contact_id = data.get('contact_discord_id')
     contact_method = data.get('contact_method', 'discord')
     
-    # فحص أيدي الديسكورد لو اختار التواصل ديسكورد فقط
     if contact_method == 'discord':
         try: contact_id_int = int(contact_id)
         except ValueError: return jsonify({"success": False, "message": "أيدي الديسكورد يجب أن يحتوي على أرقام فقط!"})
