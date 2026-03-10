@@ -69,7 +69,6 @@
         .status-2 .step { background: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.6);} 
         .status-text { font-size: 0.85rem; margin-top: 8px; color: #a1a1a6; font-weight: bold;}
 
-        /* SPA Additions */
         .hero { text-align: center; padding: 50px 20px 30px; }
         .hero h1 { font-size: 2.5rem; font-weight: 900; line-height: 1.3; margin: 15px 0; text-shadow: 0 0 15px rgba(255,255,255,0.3);}
         .hero p { color: #a1a1a6; font-size: 1.1rem; max-width: 600px; margin: 0 auto 25px; line-height: 1.6;}
@@ -359,14 +358,6 @@
                 <p style="margin-bottom: 8px;"><strong style="color:#a1a1a6;" data-i18n="lbl_num">الرقم:</strong> <span id="recPhone"></span></p>
                 <p><strong style="color:#a1a1a6;" data-i18n="lbl_rec">رقم الإيصال:</strong> <span id="recId" style="color: #fff; font-weight:bold; letter-spacing:1px;"></span></p>
             </div>
-            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 12px; border-radius: 12px; font-size: 0.9rem;">
-                <strong style="color: #fff; display:flex; align-items:center; justify-content:center; gap:5px;"><span class="material-icons-round">notifications_active</span> <span data-i18n="modal_last_step">خطوة أخيرة!</span></strong>
-                <p style="margin-top:8px; color:#d1d1d6; line-height: 1.6;">
-                    <span data-i18n="modal_send_ss_base">أرسل سكرين شوت للإيصال إلى</span><br>
-                    <span id="finalStepTarget" style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px; font-family:monospace; border: 1px solid rgba(255,255,255,0.2); margin: 0 4px; font-size: 1rem; color: #fff;">946m</span><br>
-                    <span id="finalStepMethod" data-i18n="via_discord">عبر ديسكورد.</span>
-                </p>
-            </div>
             <button class="btn-glass" style="margin-top:20px; background: #fff; color: #000;" onclick="closeModals(); location.reload();">
                 <span class="material-icons-round">chat</span> بدء المحادثة مع المصمم
             </button>
@@ -407,7 +398,7 @@
             </button>
         </div>
         <div id="custClosedAlert" style="display: none; padding: 15px; background: rgba(255,59,48,0.15); color: #ff3b30; text-align: center; font-size: 0.85rem;">
-            تم إغلاق المحادثة لانتهاء الطلب (مر 24 ساعة).
+            تم إغلاق المحادثة لانتهاء الطلب.
         </div>
     </div>
     <script>
@@ -524,34 +515,20 @@
             if(document.getElementById('ordersModal').style.display === 'flex') openOrders();
         }
 
-        // إصلاح القائمة המنسدلة
+        // الكود الجديد والمضمون لفتح القائمة المنسدلة
         function toggleProfileMenu(event) {
-            if(event) event.stopPropagation();
+            if(event) event.stopPropagation(); // يمنع اللغبطة
             var pMenu = document.getElementById("profileDropdown");
             pMenu.classList.toggle("show");
-            if(currentLang === 'en') {
-                pMenu.style.left = "auto";
-                pMenu.style.right = "0";
-            } else {
-                pMenu.style.right = "auto";
-                pMenu.style.left = "0";
-            }
         }
 
-        window.onclick = function(event) {
-            if (!event.target.closest('.user-avatar') && !event.target.closest('.profile-dropdown')) {
-                var pMenu = document.getElementById("profileDropdown");
-                if (pMenu && pMenu.classList.contains('show')) pMenu.classList.remove('show');
+        // قفل القائمة لو داس في أي مكان تاني
+        window.addEventListener('click', function(e) {
+            var pMenu = document.getElementById("profileDropdown");
+            if (pMenu && pMenu.classList.contains('show') && !e.target.closest('.profile-wrapper')) {
+                pMenu.classList.remove('show');
             }
-            if (!event.target.closest('#selectedCatBtn') && !event.target.closest('.custom-pay-dropdown')) {
-                var cMenu = document.getElementById("catMenu");
-                if (cMenu && cMenu.classList.contains('show')) cMenu.classList.remove('show');
-                var payMenu = document.getElementById("payOptions");
-                if (payMenu && payMenu.classList.contains('show')) payMenu.classList.remove('show');
-                var contactMenu = document.getElementById("contactOptions");
-                if (contactMenu && contactMenu.classList.contains('show')) contactMenu.classList.remove('show');
-            }
-        }
+        });
 
         function switchTab(sectionId, btnElement) {
             document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active-section'));
@@ -697,22 +674,6 @@
                     document.getElementById('recPkg').innerText = pkg; 
                     document.getElementById('recPhone').innerText = phone;
                     document.getElementById('recId').innerText = "#" + data.order_id;
-
-                    const finalSpan = document.getElementById('finalStepTarget');
-                    const finalMethod = document.getElementById('finalStepMethod');
-                    if (contactMethod === 'instagram') {
-                        finalSpan.innerText = '@fnoonstudio3';
-                        finalMethod.setAttribute('data-i18n', 'via_insta');
-                        finalMethod.innerText = dict['via_insta'];
-                    } else if (contactMethod === 'gmail') {
-                        finalSpan.innerText = 'fnoonstudio53@gmail.com';
-                        finalMethod.setAttribute('data-i18n', 'via_gmail');
-                        finalMethod.innerText = dict['via_gmail'];
-                    } else {
-                        finalSpan.innerText = '946m';
-                        finalMethod.setAttribute('data-i18n', 'via_discord');
-                        finalMethod.innerText = dict['via_discord'];
-                    }
                 } else { alert(data.message); }
             } catch (err) { alert(dict['err_conn']); } 
             finally { btnText.innerText = originalText; document.querySelector('#checkoutForm .btn-glass').style.pointerEvents = 'auto'; }
