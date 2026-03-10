@@ -30,7 +30,10 @@ OAUTH2_URL = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&re
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "https://fnoon.onrender.com/google_callback")
-IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
+
+# تنظيف المفتاح من أي مسافات أو علامات تنصيص بالغلط من ريندر
+raw_imgbb = os.getenv("IMGBB_API_KEY", "")
+IMGBB_API_KEY = raw_imgbb.replace('"', '').replace("'", "").strip()
 
 INSTAGRAM_CLIENT_ID = os.getenv("INSTAGRAM_CLIENT_ID")
 INSTAGRAM_CLIENT_SECRET = os.getenv("INSTAGRAM_CLIENT_SECRET")
@@ -78,15 +81,20 @@ async def add_portfolio(interaction: discord.Interaction, title: str, category: 
 
     await interaction.response.defer(ephemeral=False)
     try:
+        if not IMGBB_API_KEY:
+            return await interaction.followup.send("❌ مفتاح ImgBB غير مضاف في السيرفر!")
+        
         img_data = await image.read()
         b64_img = base64.b64encode(img_data).decode('utf-8')
-        payload = {"key": IMGBB_API_KEY, "image": b64_img}
-        res = requests.post("https://api.imgbb.com/1/upload", data=payload)
+        
+        # إرسال المفتاح في الرابط لضمان القبول
+        res = requests.post(f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}", data={"image": b64_img})
         res_data = res.json()
         if res.status_code == 200 and res_data.get("data"):
             portfolio_collection.insert_one({"title": title, "category": category.name, "image_url": res_data["data"]["url"], "date": get_egypt_time().strftime("%Y-%m-%d")})
             await interaction.followup.send(f"✅ تم رفع **{title}**!\nالرابط: {res_data['data']['url']}")
-        else: await interaction.followup.send("❌ فشل الرفع لـ ImgBB.")
+        else: 
+            await interaction.followup.send(f"❌ فشل الرفع. السبب: {res_data.get('error', {}).get('message', 'مجهول')}")
     except Exception as e: await interaction.followup.send(f"❌ حدث خطأ: {e}")
 
 @bot.tree.command(name="accept", description="قبول طلب والبدء في العمل عليه")
@@ -259,17 +267,19 @@ def send_message(order_id):
     image_url = ""
 
     if image_base64:
+        if not IMGBB_API_KEY:
+            return jsonify({"success": False, "message": "عذراً، لم يتم إعداد مفتاح الصور في السيرفر."})
         try:
-            payload = {"key": IMGBB_API_KEY, "image": image_base64}
-            res = requests.post("https://api.imgbb.com/1/upload", data=payload)
+            # إرسال المفتاح في الرابط لضمان القبول
+            res = requests.post(f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}", data={"image": image_base64})
             res_data = res.json()
             if res.status_code == 200 and res_data.get("data"):
                 image_url = res_data["data"]["url"]
             else:
                 error_msg = res_data.get("error", {}).get("message", "خطأ غير معروف")
-                return jsonify({"success": False, "message": f"رفض ImgBB الصورة والسبب: {error_msg}"})
+                return jsonify({"success": False, "message": f"رفض ImgBB الصورة: {error_msg}"})
         except Exception as e:
-            return jsonify({"success": False, "message": "حدث خطأ أثناء رفع الصورة."})
+            return jsonify({"success": False, "message": "حدث خطأ أثناء الاتصال بسيرفر الصور."})
     
     if not text and not image_url: return jsonify({"success": False})
 
