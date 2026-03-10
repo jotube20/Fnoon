@@ -1,7 +1,7 @@
 import os
 import threading
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 import discord
 from discord.ext import commands
@@ -22,19 +22,17 @@ SECOND_ADMIN_ID = 892133353757736960
 GUILD_ID = int(os.getenv("GUILD_ID", "1234567890"))
 ADMINS = [LUCIFER_ID, SECOND_ADMIN_ID]
 
-# إعدادات ديسكورد
 CLIENT_ID = os.getenv("CLIENT_ID")
 CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 REDIRECT_URI = os.getenv("REDIRECT_URI", "https://fnoon.onrender.com/callback")
 OAUTH2_URL = f"https://discord.com/api/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&response_type=code&scope=identify"
 
-# إعدادات جوجل و ImgBB
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "https://fnoon.onrender.com/google_callback")
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
-# إعدادات انستجرام
+# مسارات الانستجرام (موجودة في الباك إند احتياطياً لو فعلت حساب بيزنس قدام)
 INSTAGRAM_CLIENT_ID = os.getenv("INSTAGRAM_CLIENT_ID")
 INSTAGRAM_CLIENT_SECRET = os.getenv("INSTAGRAM_CLIENT_SECRET")
 INSTAGRAM_REDIRECT_URI = os.getenv("INSTAGRAM_REDIRECT_URI", "https://fnoon.onrender.com/instagram_callback")
@@ -43,6 +41,15 @@ client = MongoClient(MONGO_URI)
 db = client['fnoon_studio']
 orders_collection = db['orders']
 portfolio_collection = db['portfolio']
+messages_collection = db['messages'] # كولكشن الشات
+
+def is_admin():
+    if 'user' not in session: return False
+    return int(session['user']['id']) in ADMINS
+
+def get_egypt_time():
+    # توقيت مصر (UTC+2)
+    return datetime.utcnow() + timedelta(hours=2)
 
 intents = discord.Intents.default()
 intents.members = True
@@ -79,7 +86,7 @@ async def add_portfolio(interaction: discord.Interaction, title: str, category: 
         res = requests.post("https://api.imgbb.com/1/upload", data=payload)
         res_data = res.json()
         if res.status_code == 200 and res_data.get("data"):
-            portfolio_collection.insert_one({"title": title, "category": category.name, "image_url": res_data["data"]["url"], "date": datetime.now().strftime("%Y-%m-%d")})
+            portfolio_collection.insert_one({"title": title, "category": category.name, "image_url": res_data["data"]["url"], "date": get_egypt_time().strftime("%Y-%m-%d")})
             await interaction.followup.send(f"✅ تم رفع **{title}**!\nالرابط: {res_data['data']['url']}")
         else: await interaction.followup.send("❌ فشل الرفع لـ ImgBB.")
     except Exception as e: await interaction.followup.send(f"❌ حدث خطأ: {e}")
@@ -90,11 +97,12 @@ async def accept_order(interaction: discord.Interaction, order_id: str):
     orders_collection.update_one({"short_id": order_id.upper()}, {"$set": {"status": 1}})
     await interaction.response.send_message(f"✅ تم تحويل الطلب `#{order_id.upper()}` إلى جاري العمل!")
 
-@bot.tree.command(name="complete", description="تحديد الطلب كمكتمل")
+@bot.tree.command(name="complete", description="تحديد الطلب كمكتمل وبدء عداد إغلاق الشات")
 async def complete_order(interaction: discord.Interaction, order_id: str):
     if interaction.user.id not in ADMINS: return
-    orders_collection.update_one({"short_id": order_id.upper()}, {"$set": {"status": 2}})
-    await interaction.response.send_message(f"🎉 تم تحديد الطلب `#{order_id.upper()}` كـ مكتمل!")
+    completed_time = get_egypt_time().strftime("%Y-%m-%d %H:%M:%S")
+    orders_collection.update_one({"short_id": order_id.upper()}, {"$set": {"status": 2, "completed_at": completed_time}})
+    await interaction.response.send_message(f"🎉 تم تحديد الطلب `#{order_id.upper()}` كـ مكتمل، وسيتم إغلاق الشات تلقائياً بعد 24 ساعة!")
 
 async def send_admins_notification(user_name, phone, pkg, order_id, contact_id, contact_method):
     embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xffffff) 
@@ -113,10 +121,16 @@ async def send_admins_notification(user_name, phone, pkg, order_id, contact_id, 
         except Exception: pass
 
 # ==========================================
-# مسارات الموقع وتسجيل الدخول
+# مسارات الموقع
 # ==========================================
 @app.route('/')
 def home(): return render_template('index.html', user=session.get('user'))
+
+@app.route('/admin_chat')
+def admin_chat():
+    if not is_admin(): return redirect(url_for('home'))
+    orders = list(orders_collection.find().sort('_id', -1))
+    return render_template('admin_chat.html', user=session['user'], orders=orders)
 
 @app.route('/logout')
 def logout():
@@ -156,8 +170,6 @@ def google_callback():
     access_token = r.json().get("access_token")
     if not access_token: return redirect(url_for('home'))
     user_data = requests.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access_token}"}).json()
-    
-    # التعديل هنا: سحب الإيميل وتخزينه في الجلسة
     session['user'] = {
         'id': user_data['id'], 'username': user_data.get('name', 'Google User'),
         'email': user_data.get('email', ''), 'avatar': user_data.get('picture', ''), 'provider': 'google'
@@ -183,8 +195,6 @@ def instagram_callback():
     
     user_info_url = f"https://graph.instagram.com/{user_id}?fields=id,username&access_token={access_token}"
     user_info = requests.get(user_info_url).json()
-    
-    # الانستجرام لا يعطي صورة بروفايل بسهولة في الأساسيات، سنضع لوجو انستجرام كصورة افتراضية
     session['user'] = {
         'id': user_info.get('id'), 'username': user_info.get('username', 'Instagram User'),
         'avatar': 'https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg', 'provider': 'instagram'
@@ -192,8 +202,82 @@ def instagram_callback():
     return redirect(url_for('home'))
 
 # ==========================================
-# الـ APIs
+# APIs الشات والطلبات
 # ==========================================
+
+@app.route('/api/chat/<order_id>', methods=['GET'])
+def get_chat(order_id):
+    if 'user' not in session: return jsonify([])
+    order = orders_collection.find_one({"short_id": order_id})
+    if not order: return jsonify([])
+    
+    if order['user_id'] != session['user']['id'] and not is_admin(): 
+        return jsonify([])
+    
+    messages = list(messages_collection.find({"order_id": order_id}, {'_id': 0}).sort('raw_time', 1))
+    
+    chat_closed = False
+    if order.get('status') == 2 and order.get('completed_at'):
+        completed_at = datetime.strptime(order['completed_at'], "%Y-%m-%d %H:%M:%S")
+        if (get_egypt_time() - completed_at).total_seconds() > 86400:
+            chat_closed = True
+
+    return jsonify({
+        "messages": messages, 
+        "chat_closed": chat_closed,
+        "status": order.get('status'),
+        "contact_id": order.get('contact_discord_id'),
+        "contact_method": order.get('contact_method')
+    })
+
+@app.route('/api/chat/<order_id>', methods=['POST'])
+def send_message(order_id):
+    if 'user' not in session: return jsonify({"success": False, "message": "غير مصرح لك"})
+    order = orders_collection.find_one({"short_id": order_id})
+    if not order: return jsonify({"success": False, "message": "الطلب غير موجود"})
+    
+    is_adm = is_admin()
+    if order['user_id'] != session['user']['id'] and not is_adm: 
+        return jsonify({"success": False, "message": "غير مصرح لك"})
+    
+    if order.get('status') == 2 and order.get('completed_at'):
+        completed_at = datetime.strptime(order['completed_at'], "%Y-%m-%d %H:%M:%S")
+        if (get_egypt_time() - completed_at).total_seconds() > 86400:
+            return jsonify({"success": False, "message": "تم إغلاق المحادثة لانتهاء الطلب."})
+
+    data = request.json
+    text = data.get('text', '').strip()
+    image_base64 = data.get('image_base64', '') 
+    image_url = ""
+
+    if image_base64:
+        try:
+            payload = {"key": IMGBB_API_KEY, "image": image_base64}
+            res = requests.post("https://api.imgbb.com/1/upload", data=payload)
+            res_data = res.json()
+            if res.status_code == 200 and res_data.get("data"):
+                image_url = res_data["data"]["url"]
+            else:
+                return jsonify({"success": False, "message": "فشل رفع الصورة لـ ImgBB."})
+        except Exception as e:
+            return jsonify({"success": False, "message": "حدث خطأ أثناء رفع الصورة."})
+    
+    if not text and not image_url: return jsonify({"success": False})
+
+    egypt_time = get_egypt_time()
+    msg = {
+        "order_id": order_id,
+        "sender_id": session['user']['id'],
+        "sender_name": session['user']['username'],
+        "is_admin": is_adm,
+        "text": text,
+        "image_url": image_url,
+        "time_display": egypt_time.strftime("%I:%M %p"), # مثال: 08:30 PM
+        "raw_time": egypt_time.strftime("%Y-%m-%d %H:%M:%S")
+    }
+    messages_collection.insert_one(msg)
+    return jsonify({"success": True})
+
 @app.route('/api/portfolio')
 def get_portfolio(): return jsonify(list(portfolio_collection.find({}, {'_id': 0}).sort('_id', -1)))
 
@@ -201,10 +285,8 @@ def get_portfolio(): return jsonify(list(portfolio_collection.find({}, {'_id': 0
 def checkout():
     if 'user' not in session: return jsonify({"success": False, "message": "سجل دخول أولاً!"})
     
-    # التعديل الجبار: فحص ما إذا كان للعميل طلب قيد التنفيذ (منع السبام)
     active_order = orders_collection.find_one({"user_id": session['user']['id'], "status": {"$in": [0, 1]}})
-    if active_order:
-        return jsonify({"success": False, "message": "عذراً، لديك طلب قيد التنفيذ بالفعل! يرجى الانتظار حتى يكتمل لتتمكن من طلب تصميم جديد."})
+    if active_order: return jsonify({"success": False, "message": "عذراً، لديك طلب قيد التنفيذ بالفعل! يرجى الانتظار حتى يكتمل."})
 
     data = request.json
     contact_id = data.get('contact_discord_id')
@@ -221,7 +303,7 @@ def checkout():
         "user_id": session['user']['id'], "contact_discord_id": contact_id, "contact_method": contact_method,
         "username": session['user']['username'], "vodafone_number": data.get('vodafone_number'), 
         "package_name": data.get('package_name'), "price": data.get('price'), 
-        "status": 0, "date": datetime.now().strftime("%Y-%m-%d")
+        "status": 0, "date": get_egypt_time().strftime("%Y-%m-%d")
     }
     order_id = orders_collection.insert_one(new_order).inserted_id
     short_id = str(order_id)[-6:].upper()
