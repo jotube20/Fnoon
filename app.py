@@ -32,7 +32,6 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "https://fnoon.onrender.com/google_callback")
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 
-# مسارات الانستجرام (موجودة في الباك إند احتياطياً لو فعلت حساب بيزنس قدام)
 INSTAGRAM_CLIENT_ID = os.getenv("INSTAGRAM_CLIENT_ID")
 INSTAGRAM_CLIENT_SECRET = os.getenv("INSTAGRAM_CLIENT_SECRET")
 INSTAGRAM_REDIRECT_URI = os.getenv("INSTAGRAM_REDIRECT_URI", "https://fnoon.onrender.com/instagram_callback")
@@ -41,14 +40,13 @@ client = MongoClient(MONGO_URI)
 db = client['fnoon_studio']
 orders_collection = db['orders']
 portfolio_collection = db['portfolio']
-messages_collection = db['messages'] # كولكشن الشات
+messages_collection = db['messages'] 
 
 def is_admin():
     if 'user' not in session: return False
     return int(session['user']['id']) in ADMINS
 
 def get_egypt_time():
-    # توقيت مصر (UTC+2)
     return datetime.utcnow() + timedelta(hours=2)
 
 intents = discord.Intents.default()
@@ -103,6 +101,16 @@ async def complete_order(interaction: discord.Interaction, order_id: str):
     completed_time = get_egypt_time().strftime("%Y-%m-%d %H:%M:%S")
     orders_collection.update_one({"short_id": order_id.upper()}, {"$set": {"status": 2, "completed_at": completed_time}})
     await interaction.response.send_message(f"🎉 تم تحديد الطلب `#{order_id.upper()}` كـ مكتمل، وسيتم إغلاق الشات تلقائياً بعد 24 ساعة!")
+
+@bot.tree.command(name="delete_order", description="حذف طلب من قاعدة البيانات نهائياً")
+async def delete_order(interaction: discord.Interaction, order_id: str):
+    if interaction.user.id not in ADMINS: return
+    result = orders_collection.delete_one({"short_id": order_id.upper()})
+    if result.deleted_count > 0:
+        messages_collection.delete_many({"order_id": order_id.upper()})
+        await interaction.response.send_message(f"🗑️ تم حذف الطلب `#{order_id.upper()}` ورسائله نهائياً!")
+    else:
+        await interaction.response.send_message(f"❌ لم يتم العثور على الطلب `#{order_id.upper()}`.")
 
 async def send_admins_notification(user_name, phone, pkg, order_id, contact_id, contact_method):
     embed = discord.Embed(title="🚨 طلب تصميم جديد!", color=0xffffff) 
@@ -258,7 +266,6 @@ def send_message(order_id):
             if res.status_code == 200 and res_data.get("data"):
                 image_url = res_data["data"]["url"]
             else:
-                # الكود ده هيجيب رسالة الخطأ الأصلية من موقع ImgBB ويعرضها لك
                 error_msg = res_data.get("error", {}).get("message", "خطأ غير معروف")
                 return jsonify({"success": False, "message": f"رفض ImgBB الصورة والسبب: {error_msg}"})
         except Exception as e:
@@ -274,7 +281,7 @@ def send_message(order_id):
         "is_admin": is_adm,
         "text": text,
         "image_url": image_url,
-        "time_display": egypt_time.strftime("%I:%M %p"), # مثال: 08:30 PM
+        "time_display": egypt_time.strftime("%I:%M %p"), 
         "raw_time": egypt_time.strftime("%Y-%m-%d %H:%M:%S")
     }
     messages_collection.insert_one(msg)
